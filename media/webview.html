@@ -1,12 +1,15 @@
-<!DOCTYPE html>
 <html>
 
 <head>
     <meta charset="UTF-8">
-    <!-- Load jQuery, DataTables, Arquero, and Vega if needed -->
+    <!-- Load jQuery first, then DataTables, then Arquero, then Chart.js -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.datatables.net/2.2.1/js/jquery.dataTables.min.js"></script>
     <script src="https://unpkg.com/arquero"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
     <link rel="stylesheet" href="https://cdn.datatables.net/2.2.1/css/jquery.dataTables.min.css">
     <style>
         body {
@@ -19,6 +22,30 @@
             margin-bottom: 10px;
         }
 
+        /* Tabs styling */
+        #tabs {
+            margin-bottom: 10px;
+        }
+
+        .tab-button {
+            padding: 8px 16px;
+            cursor: pointer;
+            background: #e0e0e0;
+            border: none;
+            border-radius: 4px;
+            margin-right: 5px;
+            transition: background 0.3s;
+        }
+
+        .tab-button.active {
+            background: #d6d6d6;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        /* Data Tables styling */
         .table-section {
             border: 1px solid #ddd;
             padding: 8px;
@@ -76,143 +103,235 @@
             background: #eee;
         }
 
+        /* Zebra striping */
         tr:nth-child(even) {
             background: #f2f2f2;
         }
 
+        /* Hover highlight */
         tr:hover {
             background: #d0eaff !important;
             transition: background 0.2s;
         }
 
+        /* Table container: allow horizontal scrolling if needed */
         .table-content {
-            display: none;
-            padding: 8px;
             overflow-x: auto;
             transition: max-height 0.3s ease-out;
         }
+
+        /* Chart container styling */
+        #chart-container {
+            width: 100%;
+            height: 400px;
+        }
     </style>
+    <script>
+        let globalData = null; // will hold all data received from the extension
+
+        window.onload = () => {
+            // Default: show the Data tab
+            document.getElementById("content-data").style.display = "block";
+            document.getElementById("content-chart").style.display = "none";
+
+            // Tab button click handlers
+            document.getElementById("tab-data").onclick = () => {
+                document.getElementById("content-data").style.display = "block";
+                document.getElementById("content-chart").style.display = "none";
+                setActiveTab("tab-data");
+            };
+            document.getElementById("tab-chart").onclick = () => {
+                document.getElementById("content-data").style.display = "none";
+                document.getElementById("content-chart").style.display = "block";
+                setActiveTab("tab-chart");
+                renderChart();
+            };
+
+            function setActiveTab(tabId) {
+                document.querySelectorAll(".tab-button").forEach(btn => {
+                    btn.classList.remove("active");
+                });
+                document.getElementById(tabId).classList.add("active");
+            }
+
+            // Listen for fitData message from the extension
+            window.addEventListener("message", event => {
+                const message = event.data;
+                if (message.type === "fitData") {
+                    globalData = message.data;
+                    displayTables(message.data);
+                }
+            });
+
+            function displayTables(dataFrames) {
+                const aq = window.aq;
+                const container = document.getElementById("content-data");
+                container.innerHTML = ""; // Clear previous content
+
+                // Ensure recordMesgs appears first
+                const keys = Object.keys(dataFrames);
+                keys.sort((a, b) => (a === "recordMesgs" ? -1 : b === "recordMesgs" ? 1 : 0));
+                keys.forEach((key, index) => {
+                    const table = aq.from(dataFrames[key]);
+                    renderTable(container, key, table, index);
+                });
+            }
+
+            function renderTable(container, title, table, index) {
+                const tableId = "datatable_" + index;
+                const section = document.createElement("div");
+                section.classList.add("table-section");
+
+                // Header with left: title; right: copy button and toggle icon
+                const header = document.createElement("div");
+                header.classList.add("table-header");
+
+                const leftSpan = document.createElement("span");
+                leftSpan.textContent = title;
+
+                const rightContainer = document.createElement("div");
+                rightContainer.style.display = "flex";
+                rightContainer.style.alignItems = "center";
+                rightContainer.style.gap = "10px";
+
+                const copyButton = document.createElement("button");
+                copyButton.textContent = "Copy as CSV";
+                copyButton.classList.add("copy-btn");
+                copyButton.onclick = (event) => {
+                    event.stopPropagation();
+                    copyTableAsCSV(table, title);
+                };
+
+                const icon = document.createElement("span");
+                icon.textContent = "➕";
+
+                rightContainer.appendChild(copyButton);
+                rightContainer.appendChild(icon);
+                header.appendChild(leftSpan);
+                header.appendChild(rightContainer);
+
+                header.onclick = () => {
+                    const content = document.getElementById(tableId + "_content");
+                    const currentDisplay = window.getComputedStyle(content).display;
+                    const isVisible = currentDisplay === "block";
+                    content.style.display = isVisible ? "none" : "block";
+                    icon.textContent = isVisible ? "➕" : "➖";
+                };
+
+                const content = document.createElement("div");
+                content.classList.add("table-content");
+                content.id = tableId + "_content";
+                // In the default (data) view, we want to show all tables expanded.
+                content.style.display = "none";
+                icon.textContent = "➕";
+
+                const tableElement = document.createElement("table");
+                tableElement.id = tableId;
+                tableElement.classList.add("display");
+                tableElement.innerHTML = table.toHTML({ limit: Infinity });
+
+                content.appendChild(tableElement);
+                section.appendChild(header);
+                section.appendChild(content);
+                container.appendChild(section);
+
+                // Initialize DataTables.js with paging disabled (show all rows)
+                $(document).ready(function () {
+                    setTimeout(() => {
+                        $("#" + tableId).DataTable({
+                            paging: false,
+                            searching: true,
+                            ordering: true,
+                            autoWidth: true,
+                        });
+                    }, 100);
+                });
+            }
+
+            function copyTableAsCSV(table, title) {
+                const rows = table.objects().map(row => {
+                    const newRow = {};
+                    Object.keys(row).forEach(key => {
+                        const cell = row[key];
+                        newRow[key] = (typeof cell === 'object' && cell !== null) ? JSON.stringify(cell) : cell;
+                    });
+                    return newRow;
+                });
+                const flattenedTable = window.aq.from(rows);
+                const csvString = flattenedTable.toCSV({ header: true });
+                navigator.clipboard.writeText(csvString)
+                    .then(() => console.log("Copied CSV to clipboard!"))
+                    .catch(err => console.error("Failed to copy CSV:", err));
+            }
+
+            function renderChart() {
+                const chartContainer = document.getElementById("content-chart");
+                // Clear any previous content and create a container for the Vega chart
+                chartContainer.innerHTML = '<div id="vega-container"></div>';
+
+                if (globalData && globalData.recordMesgs) {
+                    const aq = window.aq;
+                    // Create an Arquero table from recordMesgs
+                    const recordTable = aq.from(globalData.recordMesgs);
+                    // Fold all columns except "timestamp"
+                    const columnsToFold = recordTable.columnNames().filter(col => col !== "timestamp");
+                    const folded = recordTable.fold(columnsToFold, { as: ["key", "value"] });
+
+                    // Define a Vega-Lite specification with faceting (one row per variable)
+                    const spec = {
+                        "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+                        "description": "Faceted chart: each subplot shows timestamp vs value for a variable",
+
+                        "data": { "values": folded.objects() },
+                        "facet": {
+                            "row": { "field": "key", "type": "nominal", "title": "Variable" }
+                        },
+                        "spec": {
+                            "width": 1600,
+                            "height": 150,
+                            "mark": "line",
+                            "encoding": {
+                                "x": {
+                                    "field": "timestamp",
+                                    "type": "temporal",
+                                    "title": "Timestamp"
+                                },
+                                "y": {
+                                    "field": "value",
+                                    "type": "quantitative",
+                                    "title": "Value",
+                                    "scale": { "zero": false }
+                                }
+                            }
+                        },
+                        "resolve": {
+                            "scale": {
+                                "y": "independent"  // Allow each facet to have its own y-scale
+                            }
+                        }
+                    };
+
+                    // Embed the chart into the container
+                    vegaEmbed("#vega-container", spec).catch(console.error);
+                } else {
+                    chartContainer.innerHTML = "<p>No recordMesgs data available for chart.</p>";
+                }
+            }
+
+        };
+    </script>
 </head>
 
 <body>
-    <h2>FIT File Data</h2>
-    <div id="tables"></div>
-
-    <script>
-        // Listen for messages from the extension
-        window.addEventListener("message", (event) => {
-            const message = event.data;
-            if (message.type === "fitData") {
-                displayTables(message.data);
-            }
-        });
-
-        function displayTables(dataFrames) {
-            const aq = window.aq;
-            const container = document.getElementById("tables");
-            container.innerHTML = "";
-
-            // Ensure recordMesgs appears first
-            const keys = Object.keys(dataFrames);
-            keys.sort((a, b) => (a === "recordMesgs" ? -1 : b === "recordMesgs" ? 1 : 0));
-
-            keys.forEach((key, index) => {
-                const table = aq.from(dataFrames[key]);
-                renderTable(container, key, table, index);
-            });
-        }
-
-        function renderTable(container, title, table, index) {
-            const tableId = "datatable_" + index;
-            const section = document.createElement("div");
-            section.classList.add("table-section");
-
-            // Header
-            const header = document.createElement("div");
-            header.classList.add("table-header");
-
-            const leftSpan = document.createElement("span");
-            leftSpan.textContent = title;
-
-            // Right container for copy button and toggle icon
-            const rightContainer = document.createElement("div");
-            rightContainer.style.display = "flex";
-            rightContainer.style.alignItems = "center";
-            rightContainer.style.gap = "10px";
-
-            const copyButton = document.createElement("button");
-            copyButton.textContent = "Copy as CSV";
-            copyButton.classList.add("copy-btn");
-            copyButton.onclick = (event) => {
-                event.stopPropagation();
-                copyTableAsCSV(table, title);
-            };
-
-            const icon = document.createElement("span");
-            icon.textContent = "➕";
-
-            rightContainer.appendChild(copyButton);
-            rightContainer.appendChild(icon);
-
-            header.appendChild(leftSpan);
-            header.appendChild(rightContainer);
-
-            header.onclick = () => {
-                const content = document.getElementById(tableId + "_content");
-                const currentDisplay = window.getComputedStyle(content).display;
-                const isVisible = currentDisplay === "block";
-                content.style.display = isVisible ? "none" : "block";
-                icon.textContent = isVisible ? "➕" : "➖";
-            };
-
-            const content = document.createElement("div");
-            content.classList.add("table-content");
-            content.id = tableId + "_content";
-            if (title === "recordMesgs") {
-                content.style.display = "block";
-                icon.textContent = "➖";
-            }
-
-            // Generate full HTML for the table (all rows)
-            const tableElement = document.createElement("table");
-            tableElement.id = tableId;
-            tableElement.classList.add("display");
-            tableElement.innerHTML = table.toHTML({ limit: Infinity });
-
-            content.appendChild(tableElement);
-            section.appendChild(header);
-            section.appendChild(content);
-            container.appendChild(section);
-
-            // Initialize DataTables with paging disabled (show all rows)
-            $(document).ready(function () {
-                setTimeout(() => {
-                    $("#" + tableId).DataTable({
-                        paging: false,
-                        searching: true,
-                        ordering: true,
-                        autoWidth: true,
-                    });
-                }, 100);
-            });
-        }
-
-        function copyTableAsCSV(table, title) {
-            const rows = table.objects().map(row => {
-                const newRow = {};
-                Object.keys(row).forEach(key => {
-                    const cell = row[key];
-                    newRow[key] = (typeof cell === 'object' && cell !== null) ? JSON.stringify(cell) : cell;
-                });
-                return newRow;
-            });
-            const flattenedTable = window.aq.from(rows);
-            const csvString = flattenedTable.toCSV({ header: true });
-            navigator.clipboard.writeText(csvString)
-                .then(() => console.log("Copied CSV to clipboard!"))
-                .catch(err => console.error("Failed to copy CSV:", err));
-        }
-    </script>
+    <h2>FIT File Viewer</h2>
+    <div id="tabs" style="margin-bottom:10px;">
+        <button class="tab-button active" id="tab-data">Data</button>
+        <button class="tab-button" id="tab-chart">Chart</button>
+    </div>
+    <div id="content-data" class="tab-content"></div>
+    <div id="content-chart" class="tab-content" style="display: none;">
+        <div id="chart-container" style="width: 100%; height: 400px;"></div>
+    </div>
 </body>
 
 </html>
