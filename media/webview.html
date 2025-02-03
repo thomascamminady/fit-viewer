@@ -16,119 +16,139 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
 
+    <!-- Our unified styles -->
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap');
+
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Open Sans', sans-serif;
             padding: 10px;
-            font-size: 13px;
+            font-size: 14px;
+            background-color: #ffffff;
+            color: #333;
+            margin: 0;
         }
 
         h2 {
-            margin-bottom: 10px;
+            margin-bottom: 20px;
+            color: #333;
         }
 
         /* Tabs styling */
         #tabs {
-            margin-bottom: 10px;
+            margin-bottom: 15px;
         }
 
         .tab-button {
-            padding: 8px 16px;
+            padding: 10px 20px;
             cursor: pointer;
-            background: #e0e0e0;
+            background: #2196F3;
             border: none;
             border-radius: 4px;
             margin-right: 5px;
-            transition: background 0.3s;
+            color: #fff;
+            font-weight: 600;
+            transition: background 0.3s, box-shadow 0.3s;
         }
 
+        .tab-button:hover,
         .tab-button.active {
-            background: #d6d6d6;
+            background: #1976D2;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
 
+        /* Tab content */
         .tab-content {
             display: none;
         }
 
         /* Data Tables styling */
         .table-section {
-            border: 1px solid #ddd;
-            padding: 8px;
-            background: #f9f9f9;
-            margin-bottom: 8px;
+            border: 1px solid #ccc;
+            background: #fff;
+            margin-bottom: 15px;
             border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
         .table-header {
             font-size: 16px;
-            font-weight: bold;
+            font-weight: 600;
             cursor: pointer;
-            background: #e0e0e0;
-            padding: 8px;
+            background: #ffffff;
+            padding: 10px 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-radius: 4px;
+            border-radius: 4px 4px 0 0;
+            color: #333;
             transition: background 0.3s;
         }
 
         .table-header:hover {
-            background: #d6d6d6;
+            background: #ddd;
         }
 
         .copy-btn {
             font-size: 12px;
-            padding: 4px 8px;
-            background: #007acc;
-            color: white;
+            padding: 6px 12px;
+            background: #2196F3;
+            color: #fff;
             border: none;
             border-radius: 4px;
             cursor: pointer;
             margin-right: 10px;
+            transition: background 0.3s;
         }
 
         .copy-btn:hover {
-            background: #005fa3;
+            background: #1976D2;
         }
 
+        .table-content {
+            overflow-x: auto;
+            padding: 15px;
+        }
+
+        /* Table styling */
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 12px;
+            font-size: 14px;
         }
 
         th,
         td {
             border: 1px solid #ddd;
-            padding: 4px;
+            padding: 8px;
             text-align: left;
         }
 
         th {
-            background: #eee;
+            background: #f0f0f0;
         }
 
-        /* Zebra striping */
         tr:nth-child(even) {
-            background: #f2f2f2;
+            background: #fafafa;
         }
 
-        /* Hover highlight */
         tr:hover {
-            background: #d0eaff !important;
+            background: #e3f2fd !important;
             transition: background 0.2s;
-        }
-
-        /* Table container: allow horizontal scrolling if needed */
-        .table-content {
-            overflow-x: auto;
-            transition: max-height 0.3s ease-out;
         }
 
         /* Chart container styling */
         #chart-container {
             width: 100%;
             height: 400px;
+        }
+
+        /* Footer styling */
+        footer {
+            margin-top: 20px;
+            font-size: 12px;
+            text-align: center;
+            color: #555;
         }
     </style>
 
@@ -239,7 +259,6 @@
                 const content = document.createElement("div");
                 content.classList.add("table-content");
                 content.id = tableId + "_content";
-                // In the default (data) view, we want to show all tables collapsed.
                 content.style.display = "none";
                 icon.textContent = "➕";
 
@@ -284,18 +303,14 @@
 
             function renderChart() {
                 const chartContainer = document.getElementById("content-chart");
-                // Clear any previous content and create a container for the Vega chart
                 chartContainer.innerHTML = '<div id="vega-container"></div>';
 
                 if (globalData && globalData.recordMesgs) {
                     const aq = window.aq;
-                    // Create an Arquero table from recordMesgs
                     const recordTable = aq.from(globalData.recordMesgs);
-                    // Fold all columns except "timestamp"
                     const columnsToFold = recordTable.columnNames().filter(col => col !== "timestamp");
                     const folded = recordTable.fold(columnsToFold, { as: ["key", "value"] });
 
-                    // Define a Vega-Lite specification with faceting (one row per variable)
                     const spec = {
                         "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
                         "description": "Faceted chart: each subplot shows timestamp vs value for a variable",
@@ -328,7 +343,6 @@
                         }
                     };
 
-                    // Embed the chart into the container
                     vegaEmbed("#vega-container", spec).catch(console.error);
                 } else {
                     chartContainer.innerHTML = "<p>No recordMesgs data available for chart.</p>";
@@ -337,26 +351,20 @@
 
             function renderMap() {
                 const mapContainer = document.getElementById("content-map");
-                // Clear any previous content and create a container for the Leaflet map
-                mapContainer.innerHTML = '<div id="leaflet-map" style="height: 400px;"></div>';
+                mapContainer.innerHTML = '<div id="leaflet-map" style="height: 800px;"></div>';
 
-                // Initialize the map; starting at [0,0] with zoom level 2
                 const map = L.map('leaflet-map').setView([0, 0], 2);
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 }).addTo(map);
 
-                // Check if location data is available in globalData.recordMesgs
                 if (globalData && globalData.recordMesgs) {
-                    // Extract records that contain both positionLat and positionLong
                     const coords = globalData.recordMesgs
                         .filter(row => row.positionLat != null && row.positionLong != null)
                         .map(row => [Number(row.positionLat / 2 ** 31 * 180), Number(row.positionLong / 2 ** 31 * 180)]);
 
                     if (coords.length > 0) {
-                        // Draw a polyline using the coordinates
                         const polyline = L.polyline(coords, { color: 'blue' }).addTo(map);
-                        // Fit the map view to the bounds of the polyline
                         map.fitBounds(polyline.getBounds());
                     } else {
                         mapContainer.innerHTML = '<p>No location data available to display map.</p>';
@@ -370,17 +378,26 @@
 </head>
 
 <body>
-    <h2>FIT File Viewer</h2>
-    <div id="tabs" style="margin-bottom:10px;">
+    <div id="tabs">
         <button class="tab-button active" id="tab-data">Data</button>
         <button class="tab-button" id="tab-chart">Chart</button>
         <button class="tab-button" id="tab-map">Map</button>
     </div>
     <div id="content-data" class="tab-content"></div>
-    <div id="content-chart" class="tab-content" style="display: none;">
-        <div id="chart-container" style="width: 100%; height: 400px;"></div>
+    <div id="content-chart" class="tab-content">
+        <div id="chart-container"></div>
     </div>
-    <div id="content-map" class="tab-content" style="display: none;"></div>
+    <div id="content-map" class="tab-content"></div>
+    <!-- Credits Section -->
+    <footer>
+        <p>
+            Credits:&nbsp;
+            <a href="https://leafletjs.com/" target="_blank">Leaflet</a>,
+            <a href="https://www.garmin.com/" target="_blank">Garmin</a>,
+            <a href="https://github.com/garmin/fit-javascript-sdk" target="_blank">Garmin FIT JavaScript SDK</a>,
+            and <a href="https://vega.github.io/" target="_blank">Vega</a>
+        </p>
+    </footer>
 </body>
 
 </html>
