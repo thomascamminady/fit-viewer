@@ -1,10 +1,11 @@
 import * as vscode from 'vscode';
-import { decodeFitFile } from './fitParser.js';  // ✅ Fix extension
+import { decodeFitFile } from './fitParser';
+import { parseMessages } from './parseMessages';
 
 export class FitFileEditorProvider implements vscode.CustomReadonlyEditorProvider {
     
     public static register(context: vscode.ExtensionContext): vscode.Disposable {
-        console.log("📂 Registering FitFileEditorProvider...");
+        console.log("Registering FitFileEditorProvider...");
         return vscode.window.registerCustomEditorProvider(
             FitFileEditorProvider.viewType,
             new FitFileEditorProvider(context),
@@ -19,7 +20,7 @@ export class FitFileEditorProvider implements vscode.CustomReadonlyEditorProvide
     private static readonly viewType = 'fitViewer.fitEditor';
 
     constructor(private readonly context: vscode.ExtensionContext) {
-        console.log("🔧 FitFileEditorProvider constructor called...");
+        console.log("FitFileEditorProvider constructor called...");
     }
 
     public async openCustomDocument(
@@ -27,7 +28,7 @@ export class FitFileEditorProvider implements vscode.CustomReadonlyEditorProvide
         _openContext: vscode.CustomDocumentOpenContext,
         _token: vscode.CancellationToken
     ): Promise<vscode.CustomDocument> {
-        console.log("📄 Opening FIT file:", uri.fsPath);
+        console.log("Opening FIT file:", uri.fsPath);
         return { uri, dispose: () => {} };
     }
 
@@ -36,32 +37,65 @@ export class FitFileEditorProvider implements vscode.CustomReadonlyEditorProvide
         webviewPanel: vscode.WebviewPanel,
         _token: vscode.CancellationToken
     ): Promise<void> {
-        console.log("🖥️ Resolving custom editor for:", document.uri.fsPath);
+        console.log("Resolving custom editor for:", document.uri.fsPath);
         webviewPanel.webview.options = { enableScripts: true };
 
-        const fileData = await vscode.workspace.fs.readFile(document.uri);
-        console.log("📥 File data loaded, decoding FIT file...");
+        const workspaceFs = vscode.workspace.fs;
+        const fileData = await workspaceFs.readFile(document.uri);
+        const rawMessages = await decodeFitFile(fileData);
 
-        const data = await decodeFitFile(fileData);
-        console.log("✅ Decoded FIT file data:", data);
+        console.log("Decoded FIT file data:", rawMessages);
 
-        webviewPanel.webview.html = this.getHtmlForWebview(data);
+        // ✅ Ensure we correctly await the dynamic import
+        const tables = await parseMessages(rawMessages);
+
+        webviewPanel.webview.html = this.getHtmlForWebview();
+        webviewPanel.webview.postMessage({ type: "fitData", data: tables });
     }
 
-    private getHtmlForWebview(data: any): string {
-        console.log("🖼️ Generating HTML for webview...");
+    private getHtmlForWebview(): string {
         return `
             <html>
             <head>
+                <script src="https://unpkg.com/arquero"></script>
                 <script>
                     window.onload = () => {
-                        document.getElementById('data').textContent = JSON.stringify(${JSON.stringify(data, null, 2)}, null, 2);
+                        window.addEventListener("message", event => {
+                            const message = event.data;
+                            if (message.type === "fitData") {
+                                displayTables(message.data);
+                            }
+                        });
+
+                        function displayTables(dataFrames) {
+                            const aq = window.aq;
+                            const container = document.getElementById("tables");
+
+                            Object.keys(dataFrames).forEach(key => {
+                                const table = aq.from(dataFrames[key]);
+                                renderTable(container, key, table);
+                            });
+                        }
+
+                        function renderTable(container, title, table) {
+                            const tableDiv = document.createElement("div");
+                            tableDiv.style.marginBottom = "20px";
+                            
+                            const heading = document.createElement("h3");
+                            heading.textContent = title;
+                            
+                            const htmlTable = table.toHTML(); // Convert Arquero Table to HTML
+                            tableDiv.appendChild(heading);
+                            tableDiv.innerHTML += htmlTable;
+                            
+                            container.appendChild(tableDiv);
+                        }
                     };
                 </script>
             </head>
             <body>
                 <h2>FIT File Data</h2>
-                <pre id="data"></pre>
+                <div id="tables"></div>
             </body>
             </html>
         `;
