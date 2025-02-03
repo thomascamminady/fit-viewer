@@ -1,0 +1,44 @@
+{
+  "name": "fit-viewer",
+  "displayName": "FIT Viewer",
+  "description": "A VSCode extension to preview .fit files",
+  "version": "0.0.1",
+  "publisher": "thomascamminady",
+  "engines": {
+    "vscode": "^1.96.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "*"
+  ],
+  "contributes": {
+    "customEditors": [
+      {
+        "viewType": "fitViewer.fitEditor",
+        "displayName": "FIT File Viewer",
+        "selector": [
+          {
+            "filenamePattern": "*.fit"
+          }
+        ]
+      }
+    ]
+  },
+  "main": "./out/extension.js",
+  "scripts": {
+    "compile": "tsc -p ./",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.96.0",
+    "@vscode/vsce": "^2.19.0",
+    "typescript": "^5.7.3"
+  },
+  "dependencies": {
+    "@garmin/fitsdk": "^21.161.0"
+  }
+}

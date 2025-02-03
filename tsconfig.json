@@ -1,0 +1,26 @@
+{
+	"compilerOptions": {
+		"module": "NodeNext", // ✅ Allows importing both CommonJS and ES modules
+		"moduleResolution": "NodeNext",
+		"target": "ES2022",
+		"lib": [
+			"ES2022",
+			"DOM"
+		],
+		"allowJs": true,
+		"checkJs": false,
+		"skipLibCheck": true,
+		"noImplicitAny": false,
+		"outDir": "out",
+		"types": [
+			"node",
+			"vscode",
+			"mocha"
+		],
+		"esModuleInterop": true,
+		"resolveJsonModule": true
+	},
+	"include": [
+		"src"
+	]
+}
