@@ -4,10 +4,6 @@
   "description": "A VSCode extension to preview .fit files",
   "version": "0.0.1",
   "publisher": "thomascamminady",
-  "repository": {
-    "type": "git",
-    "url": ""
-  },
   "engines": {
     "vscode": "^1.96.0"
   },
@@ -32,7 +28,8 @@
   },
   "main": "./out/extension.js",
   "scripts": {
-    "compile": "tsc -p ./",
+    "compile": "tsc -p ./ && npm run copy-assets",
+    "copy-assets": "copyfiles -u 1 media/* out/media/",
     "package": "vsce package"
   },
   "devDependencies": {
@@ -40,7 +37,8 @@
     "@types/node": "^20.0.0",
     "@types/vscode": "^1.96.0",
     "@vscode/vsce": "^2.19.0",
-    "typescript": "^5.7.3"
+    "typescript": "^5.7.3",
+    "copyfiles": "^2.4.1"
   },
   "dependencies": {
     "@garmin/fitsdk": "^21.161.0",
