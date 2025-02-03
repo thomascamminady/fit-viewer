@@ -4,6 +4,10 @@
   "description": "A VSCode extension to preview .fit files",
   "version": "0.0.1",
   "publisher": "thomascamminady",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
   "engines": {
     "vscode": "^1.96.0"
   },

@@ -3,7 +3,7 @@ import { decodeFitFile } from './fitParser';
 import { parseMessages } from './parseMessages';
 
 export class FitFileEditorProvider implements vscode.CustomReadonlyEditorProvider {
-    
+
     public static register(context: vscode.ExtensionContext): vscode.Disposable {
         console.log("Registering FitFileEditorProvider...");
         return vscode.window.registerCustomEditorProvider(
@@ -29,7 +29,7 @@ export class FitFileEditorProvider implements vscode.CustomReadonlyEditorProvide
         _token: vscode.CancellationToken
     ): Promise<vscode.CustomDocument> {
         console.log("Opening FIT file:", uri.fsPath);
-        return { uri, dispose: () => {} };
+        return { uri, dispose: () => { } };
     }
 
     public async resolveCustomEditor(
@@ -52,52 +52,225 @@ export class FitFileEditorProvider implements vscode.CustomReadonlyEditorProvide
         webviewPanel.webview.html = this.getHtmlForWebview();
         webviewPanel.webview.postMessage({ type: "fitData", data: tables });
     }
-
     private getHtmlForWebview(): string {
         return `
-            <html>
-            <head>
-                <script src="https://unpkg.com/arquero"></script>
-                <script>
+                <html>
+                <head>
+                    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+                    <script src="https://cdn.datatables.net/2.2.1/js/jquery.dataTables.min.js"></script>
+                    <script src="https://unpkg.com/arquero"></script>
+                    <link rel="stylesheet" href="https://cdn.datatables.net/2.2.1/css/jquery.dataTables.min.css">
+                    <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        padding: 10px;
+                        font-size: 13px;
+                    }
+                    
+                    h2 {
+                        margin-bottom: 10px;
+                    }
+                    
+                    .table-section {
+                        border: 1px solid #ddd;
+                        padding: 8px;
+                        background: #f9f9f9;
+                        margin-bottom: 8px;
+                        border-radius: 4px;
+                    }
+                    
+                    .table-header {
+                        font-size: 16px;
+                        font-weight: bold;
+                        cursor: pointer;
+                        background: #e0e0e0;
+                        padding: 8px;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        border-radius: 4px;
+                        transition: background 0.3s;
+                    }
+                    
+                    .table-header:hover {
+                        background: #d6d6d6;
+                    }
+                    
+                    .table-header span {
+                        font-size: 18px;
+                        font-weight: bold;
+                        transition: transform 0.3s ease;
+                    }
+                    
+                    .copy-btn {
+                        font-size: 12px;
+                        padding: 4px 8px;
+                        background: #007acc;
+                        color: white;
+                        border: none;
+                        border-radius: 4px;
+                        cursor: pointer;
+                        margin-right: 10px;
+                    }
+                    
+                    .copy-btn:hover {
+                        background: #005fa3;
+                    }
+                    
+                    /* Table styles for compactness */
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        font-size: 12px;
+                    }
+                    
+                    th, td {
+                        border: 1px solid #ddd;
+                        padding: 4px;
+                        text-align: left;
+                    }
+                    
+                    th {
+                        background: #eee;
+                    }
+                    
+                    /* Zebra striping */
+                    tr:nth-child(even) {
+                        background: #f2f2f2;
+                    }
+                    
+                    /* Hover highlight */
+                    tr:hover {
+                        background: #d0eaff !important;
+                        transition: background 0.2s;
+                    }
+                    
+                    /* Ensure the table-content div has a smooth transition */
+                    .table-content {
+                        display: none;
+                        padding: 8px;
+                        transition: max-height 0.3s ease-out;
+                    }
+                    </style>
+                    <script>
                     window.onload = () => {
-                        window.addEventListener("message", event => {
-                            const message = event.data;
-                            if (message.type === "fitData") {
-                                displayTables(message.data);
-                            }
+                        window.addEventListener("message", (event) => {
+                        const message = event.data;
+                        if (message.type === "fitData") {
+                            displayTables(message.data);
+                        }
                         });
 
                         function displayTables(dataFrames) {
-                            const aq = window.aq;
-                            const container = document.getElementById("tables");
+                        const aq = window.aq;
+                        const container = document.getElementById("tables");
+                        container.innerHTML = ""; // Clear previous content
 
-                            Object.keys(dataFrames).forEach(key => {
-                                const table = aq.from(dataFrames[key]);
-                                renderTable(container, key, table);
-                            });
+                        // Ensure recordMesgs appears first
+                        const keys = Object.keys(dataFrames);
+                        keys.sort((a, b) => (a === "recordMesgs" ? -1 : b === "recordMesgs" ? 1 : 0));
+
+                        keys.forEach((key, index) => {
+                            const table = aq.from(dataFrames[key]);
+                            renderTable(container, key, table, index);
+                        });
                         }
 
-                        function renderTable(container, title, table) {
-                            const tableDiv = document.createElement("div");
-                            tableDiv.style.marginBottom = "20px";
-                            
-                            const heading = document.createElement("h3");
-                            heading.textContent = title;
-                            
-                            const htmlTable = table.toHTML(); // Convert Arquero Table to HTML
-                            tableDiv.appendChild(heading);
-                            tableDiv.innerHTML += htmlTable;
-                            
-                            container.appendChild(tableDiv);
+                        function renderTable(container, title, table, index) {
+                        const tableId = "datatable_" + index;
+                        const section = document.createElement("div");
+                        section.classList.add("table-section");
+
+                        // Create header container with left and right parts
+                        const header = document.createElement("div");
+                        header.classList.add("table-header");
+
+                        // Left side: Title
+                        const leftSpan = document.createElement("span");
+                        leftSpan.textContent = title;
+
+                        // Right side: container for copy button and toggle icon
+                        const rightContainer = document.createElement("div");
+                        rightContainer.style.display = "flex";
+                        rightContainer.style.alignItems = "center";
+                        rightContainer.style.gap = "10px";
+
+                        // Copy as CSV Button
+                        const copyButton = document.createElement("button");
+                        copyButton.textContent = "Copy as CSV";
+                        copyButton.classList.add("copy-btn");
+                        copyButton.onclick = (event) => {
+                            event.stopPropagation(); // Prevent header toggle when clicking copy
+                            copyTableAsCSV(table, title);
+                        };
+
+                        // Toggle Icon
+                        const icon = document.createElement("span");
+                        icon.textContent = "➕";
+
+                        // Append copy button and toggle icon to the right container
+                        rightContainer.appendChild(copyButton);
+                        rightContainer.appendChild(icon);
+
+                        // Append left and right containers to the header
+                        header.appendChild(leftSpan);
+                        header.appendChild(rightContainer);
+
+                        // Toggle header click
+                        header.onclick = () => {
+                            const content = document.getElementById(tableId + "_content");
+                            const currentDisplay = window.getComputedStyle(content).display;
+                            const isVisible = currentDisplay === "block";
+                            content.style.display = isVisible ? "none" : "block";
+                            icon.textContent = isVisible ? "➕" : "➖";
+                        };
+
+                        // Content (table container)
+                        const content = document.createElement("div");
+                        content.classList.add("table-content");
+                        content.id = tableId + "_content";
+                        content.style.display = "block";
+                        icon.textContent = "➖";
+                        
+
+                        // Table element
+                        const tableElement = document.createElement("table");
+                        tableElement.id = tableId;
+                        tableElement.classList.add("display");
+                        tableElement.innerHTML = table.toHTML();
+
+                        content.appendChild(tableElement);
+                        section.appendChild(header);
+                        section.appendChild(content);
+                        container.appendChild(section);
+
+                        // Initialize DataTables.js for search and sorting functionality
+                        $(document).ready(function () {
+                            setTimeout(() => {
+                            $("#" + tableId).DataTable({
+                                paging: true,
+                                searching: true,
+                                ordering: true,
+                                autoWidth: true,
+                            });
+                            }, 100);
+                        });
+                        }
+
+                        function copyTableAsCSV(table, title) {
+                        const csvString = table.toCSV();
+                        navigator.clipboard.writeText(csvString)
+                            .then(() => console.log("Copied CSV to clipboard!"))
+                            .catch(err => console.error("Failed to copy CSV:", err));
                         }
                     };
-                </script>
-            </head>
-            <body>
-                <h2>FIT File Data</h2>
-                <div id="tables"></div>
-            </body>
-            </html>
+                    </script>
+                </head>
+                <body>
+                    <h2>FIT File Data</h2>
+                    <div id="tables"></div>
+                </body>
+                </html>
         `;
     }
 }
