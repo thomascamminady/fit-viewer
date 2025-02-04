@@ -161,9 +161,9 @@
             vscode.postMessage({ type: "ready" });
 
             // Default: show the Data tab
-            document.getElementById("content-data").style.display = "block";
+            document.getElementById("content-data").style.display = "none";
             document.getElementById("content-chart").style.display = "none";
-            document.getElementById("content-map").style.display = "none";
+            document.getElementById("content-map").style.display = "block";
 
             // Tab button click handlers
             document.getElementById("tab-data").onclick = () => {
@@ -201,9 +201,18 @@
                 const message = event.data;
                 if (message.type === "fitData") {
                     globalData = message.data;
-                    displayTables(message.data);
+                    setTimeout(() => {
+                        displayTables(globalData);
+                        if (document.getElementById("tab-chart").classList.contains("active")) {
+                            renderChart();
+                        }
+                        if (document.getElementById("tab-map").classList.contains("active")) {
+                            renderMap();
+                        }
+                    }, 0);
                 }
             });
+
 
             function displayTables(dataFrames) {
                 const aq = window.aq;
@@ -323,7 +332,7 @@
                             "row": { "field": "key", "type": "nominal", "title": "Variable" }
                         },
                         "spec": {
-                            "width": 1600,
+                            "width": 1000,
                             "height": 150,
                             "mark": "line",
                             "encoding": {
@@ -383,23 +392,25 @@
 
 <body>
     <div id="tabs">
-        <button class="tab-button active" id="tab-data">Data</button>
+        <button class="tab-button active" id="tab-map">Map</button>
+        <button class="tab-button" id="tab-data">Data</button>
         <button class="tab-button" id="tab-chart">Chart</button>
-        <button class="tab-button" id="tab-map">Map</button>
     </div>
+    <div id="content-map" class="tab-content"></div>
     <div id="content-data" class="tab-content"></div>
     <div id="content-chart" class="tab-content">
         <div id="chart-container"></div>
     </div>
-    <div id="content-map" class="tab-content"></div>
     <!-- Credits Section -->
     <footer>
         <p>
             Credits:&nbsp;
             <a href="https://leafletjs.com/" target="_blank">Leaflet</a>,
-            <a href="https://www.garmin.com/" target="_blank">Garmin</a>,
+            <a href="https://datatables.net/" target="_blank">DataTables.js</a>,
+            <a href="https://github.com/uwdata/arquero" target="_blank">arquero</a>,
             <a href="https://github.com/garmin/fit-javascript-sdk" target="_blank">Garmin FIT JavaScript SDK</a>,
-            and <a href="https://vega.github.io/" target="_blank">Vega</a>
+            <a href="https://vega.github.io/" target="_blank">Vega</a>,
+            <a href="https://github.com/thomascamminady/fit-viewer" target="_blank">this repo</a>.
         </p>
     </footer>
 </body>

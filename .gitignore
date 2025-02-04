@@ -4,3 +4,4 @@ node_modules
 .vscode-test/
 *.vsix
 src/test/*.fit
+.DS_Store
