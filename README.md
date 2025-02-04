@@ -1,14 +1,16 @@
 # fit-viewer README
 
-Open `.fit` files within `vscode`. 
+Open `.fit` files within `vscode` . 
+
+![Map](screenshots/map.png)
+
+![Table](screenshots/data.png)
+
+![Charts](screenshots/chart.png)
 
 ## How to install
 
-Look for `FIT File Viewer` in the [Marketplace](https://marketplace.visualstudio.com/items?itemName=ThomasCamminady.fit-viewer).
-
-## How to install .vsix
-
-* Install the extension
+* Install the extension: Look for `FIT File Viewer` in the [Marketplace](https://marketplace.visualstudio.com/items?itemName=ThomasCamminady.fit-viewer)
 * Right-click on a `.fit` file, select `Open with...`
 * Click `Configure default editor for '*.fit'...`
 * Click `FIT File Viewer`
@@ -25,6 +27,10 @@ npm run package
 ```
 
 Upload extension to `https://marketplace.visualstudio.com/manage/publishers/thomascamminady`
+
+## Disclaimer
+
+No work in this repository is affiliated with my employer, [Wahoo Fitness](http://www.wahoofitness.com). 
 
 ## Credit
 
