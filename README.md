@@ -18,8 +18,9 @@ rm -rf node_modules out
 npm install
 npm run compile
 npm run package
-code --install-extension fit-viewer-0.0.1.vsix
 ```
+
+Upload extension to `https://marketplace.visualstudio.com/manage/publishers/thomascamminady`
 
 ## Credit
 
