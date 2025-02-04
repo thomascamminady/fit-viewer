@@ -39,7 +39,7 @@ I have no idea what I am doing here. All code was written by ChatGPT and I haven
 ## Credit
 
 Uses:
-* [https://github.com/garmin/fit-javascript-sdk](https://github.com/garmin/fit-javascript-sdk), Flexible and Interoperable Data Transfer (FIT) Protocol License Agreement
+* [https://github.com/garmin/fit-javascript-sdk](https://github.com/garmin/fit-javascript-sdk), FIT Protocol License Agreement
 * [https://leafletjs.com](https://leafletjs.com), BSD-2-Clause license
 * [https://vega.github.io/vega-lite/](https://vega.github.io/vega-lite/), BSD-3-Clause license
 * [https://github.com/vega/vega-embed](https://github.com/vega/vega-embed), BSD-3-Clause license
