@@ -2,7 +2,7 @@
   "name": "fit-viewer",
   "displayName": "FIT File Viewer",
   "description": "A VSCode extension to preview .fit files",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/thomascamminady/fit-viewer"

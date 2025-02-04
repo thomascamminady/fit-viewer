@@ -28,9 +28,13 @@ npm run package
 
 Upload extension to `https://marketplace.visualstudio.com/manage/publishers/thomascamminady`
 
-## Disclaimer
+## Disclaimer 1
 
 No work in this repository is affiliated with my employer, [Wahoo Fitness](http://www.wahoofitness.com). 
+
+## Disclaimer 2
+
+I have no idea what I am doing here. All code was written by ChatGPT and I haven't written a single line of JavaScript or TypeScript on my own. Suggestions to improve this code are very much appreciated.
 
 ## Credit
 
