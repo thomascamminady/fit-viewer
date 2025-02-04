@@ -156,6 +156,10 @@
         let globalData = null; // will hold all data received from the extension
 
         window.onload = () => {
+            // Signal to the extension that the webview is ready
+            const vscode = acquireVsCodeApi();
+            vscode.postMessage({ type: "ready" });
+
             // Default: show the Data tab
             document.getElementById("content-data").style.display = "block";
             document.getElementById("content-chart").style.display = "none";

@@ -52,6 +52,13 @@ export class FitFileEditorProvider implements vscode.CustomReadonlyEditorProvide
         let htmlContent = fs.readFileSync(htmlPath, 'utf8');
 
         webviewPanel.webview.html = htmlContent;
-        webviewPanel.webview.postMessage({ type: "fitData", data: tables });
+
+        // Listen for the 'ready' message from the webview
+        webviewPanel.webview.onDidReceiveMessage(message => {
+            if (message.type === "ready") {
+                // Now that the webview is ready, send the fitData
+                webviewPanel.webview.postMessage({ type: "fitData", data: tables });
+            }
+        });
     }
 }
