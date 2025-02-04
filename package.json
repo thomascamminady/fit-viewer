@@ -8,7 +8,7 @@
     "url": "https://github.com/thomascamminady/fit-viewer"
   },
   "icon": "icon.png",
-  "publisher": "thomascammiady",
+  "publisher": "thomascamminady",
   "author": "Thomas Camminady",
   "engines": {
     "vscode": "^1.96.0"
