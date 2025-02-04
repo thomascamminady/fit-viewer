@@ -2,7 +2,11 @@
 
 Open `.fit` files within `vscode`. 
 
-## How to
+## How to install
+
+Look for `FIT File Viewer` in the [Marketplace](https://marketplace.visualstudio.com/items?itemName=ThomasCamminady.fit-viewer).
+
+## How to install .vsix
 
 * Install the extension
 * Right-click on a `.fit` file, select `Open with...`
