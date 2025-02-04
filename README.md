@@ -1,6 +1,6 @@
 # fit-viewer README
 
-Open `.fit` files within `vscode` . 
+Open `.fit` files within `vscode`. 
 
 ## How to
 
