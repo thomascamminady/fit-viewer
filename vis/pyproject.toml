@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "vis"
+version = "0.1.0"
+description = ""
+authors = ["Thomas Camminady <0milieux_member@icloud.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.11,<3.13"
+ipykernel = "^6.29.5"
+polars = "^1.21.0"
+altair = "^5.5.0"
+fit2parquets = "^0.7.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

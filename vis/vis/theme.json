@@ -1,0 +1,85 @@
+{
+    "config": {
+        "text": {
+            "color": "gray",
+            "fontSize": 14
+        },
+        "title": {
+            "anchor": "middle",
+            "fontWeight": "normal",
+            "titleFontWeight": "normal",
+            "labelFontWeight": "normal",
+            "fontSize": 30,
+            "titleFontSize": 16,
+            "labelFontSize": 14,
+            "color": "gray",
+            "titleColor": "gray",
+            "labelColor": "gray",
+            "tickColor": "gray",
+            "domainColor": "gray"
+        },
+        "header": {
+            "titleFontSize": 22,
+            "labelFontSize": 18,
+            "color": "gray",
+            "titleColor": "gray",
+            "labelColor": "gray",
+            "fontWeight": "normal",
+            "titleFontWeight": "normal",
+            "labelFontWeight": "normal"
+        },
+        "view": {
+            "height": 800,
+            "width": 800,
+            "strokeWidth": 0,
+            "fill": "white"
+        },
+        "axis": {
+            "domain": true,
+            "domainColor": "gray",
+            "domainWidth": 1,
+            "gridWidth": 1,
+            "labelAngle": 0,
+            "tickSize": 5,
+            "gridCap": "round",
+            "gridDash": [
+                2,
+                4
+            ],
+            "fontWeight": "normal",
+            "titleFontWeight": "normal",
+            "labelFontWeight": "normal",
+            "fontSize": 30,
+            "titleFontSize": 16,
+            "labelFontSize": 14,
+            "color": "gray",
+            "titleColor": "gray",
+            "labelColor": "gray",
+            "tickColor": "gray"
+        },
+        "axisX": {
+            "titleAnchor": "end",
+            "titleAlign": "center"
+        },
+        "axisY": {
+            "titleAnchor": "end",
+            "titleAngle": 0,
+            "titleAlign": "center",
+            "titleY": -15,
+            "titleX": 0
+        },
+        "legend": {
+            "fontWeight": "normal",
+            "titleFontWeight": "normal",
+            "labelFontWeight": "normal",
+            "fontSize": 30,
+            "titleFontSize": 16,
+            "labelFontSize": 14,
+            "color": "gray",
+            "titleColor": "gray",
+            "labelColor": "gray",
+            "tickColor": "gray",
+            "domainColor": "gray"
+        }
+    }
+}
