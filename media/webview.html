@@ -325,35 +325,368 @@
                     const folded = recordTable.fold(columnsToFold, { as: ["key", "value"] });
 
                     const spec = {
-                        "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-                        "description": "Faceted chart: each subplot shows timestamp vs value for a variable",
+                        "config": {
+                            "text": {
+                                "color": "gray",
+                                "fontSize": 14
+                            },
+                            "title": {
+                                "anchor": "middle",
+                                "fontWeight": "normal",
+                                "titleFontWeight": "normal",
+                                "labelFontWeight": "normal",
+                                "fontSize": 30,
+                                "titleFontSize": 16,
+                                "labelFontSize": 14,
+                                "color": "gray",
+                                "titleColor": "gray",
+                                "labelColor": "gray",
+                                "tickColor": "gray",
+                                "domainColor": "gray"
+                            },
+                            "header": {
+                                "titleFontSize": 22,
+                                "labelFontSize": 18,
+                                "color": "gray",
+                                "titleColor": "gray",
+                                "labelColor": "gray",
+                                "fontWeight": "normal",
+                                "titleFontWeight": "normal",
+                                "labelFontWeight": "normal"
+                            },
+                            "view": {
+                                "height": 800,
+                                "width": 800,
+                                "strokeWidth": 0,
+                                "fill": "white"
+                            },
+                            "axis": {
+                                "domain": true,
+                                "domainColor": "gray",
+                                "domainWidth": 1,
+                                "gridWidth": 1,
+                                "labelAngle": 0,
+                                "tickSize": 5,
+                                "gridCap": "round",
+                                "gridDash": [
+                                    2,
+                                    4
+                                ],
+                                "fontWeight": "normal",
+                                "titleFontWeight": "normal",
+                                "labelFontWeight": "normal",
+                                "fontSize": 30,
+                                "titleFontSize": 16,
+                                "labelFontSize": 14,
+                                "color": "gray",
+                                "titleColor": "gray",
+                                "labelColor": "gray",
+                                "tickColor": "gray"
+                            },
+                            "axisX": {
+                                "titleAnchor": "end",
+                                "titleAlign": "center"
+                            },
+                            "axisY": {
+                                "titleAnchor": "end",
+                                "titleAngle": 0,
+                                "titleAlign": "center",
+                                "titleY": -15,
+                                "titleX": 0
+                            },
+                            "legend": {
+                                "fontWeight": "normal",
+                                "titleFontWeight": "normal",
+                                "labelFontWeight": "normal",
+                                "fontSize": 30,
+                                "titleFontSize": 16,
+                                "labelFontSize": 14,
+                                "color": "gray",
+                                "titleColor": "gray",
+                                "labelColor": "gray",
+                                "tickColor": "gray",
+                                "domainColor": "gray"
+                            }
+                        },
                         "data": { "values": folded.objects() },
                         "facet": {
-                            "row": { "field": "key", "type": "nominal", "title": "Variable" }
+                            "row": {
+                                "field": "key",
+                                "header": {
+                                    "labelOrient": "right",
+                                    "labelAngle": 0
+                                },
+                                "type": "nominal"
+                            }
                         },
                         "spec": {
-                            "width": 1000,
-                            "height": 150,
-                            "mark": "line",
-                            "encoding": {
-                                "x": {
-                                    "field": "timestamp",
-                                    "type": "temporal",
-                                    "title": "Timestamp"
+                            "layer": [
+                                {
+                                    "mark": {
+                                        "type": "line",
+                                        "color": "#1f77b4"
+                                    },
+                                    "encoding": {
+                                        "opacity": {
+                                            "value": 0.2
+                                        },
+                                        "x": {
+                                            "field": "timestamp",
+                                            "title": "Elapsed time (seconds)",
+                                            "type": "temporal"
+                                        },
+                                        "y": {
+                                            "field": "value",
+                                            "scale": {
+                                                "zero": false
+                                            },
+                                            "title": "",
+                                            "type": "quantitative"
+                                        }
+                                    },
+                                    "name": "view_11"
                                 },
-                                "y": {
-                                    "field": "value",
-                                    "type": "quantitative",
-                                    "title": "Value",
-                                    "scale": { "zero": false }
+                                {
+                                    "mark": {
+                                        "type": "line",
+                                        "color": "#1f77b4"
+                                    },
+                                    "encoding": {
+                                        "opacity": {
+                                            "value": 1
+                                        },
+                                        "x": {
+                                            "field": "timestamp",
+                                            "type": "temporal"
+                                        },
+                                        "y": {
+                                            "field": "value",
+                                            "scale": {
+                                                "zero": false
+                                            },
+                                            "type": "quantitative"
+                                        }
+                                    },
+                                    "transform": [
+                                        {
+                                            "filter": {
+                                                "param": "param_11"
+                                            }
+                                        }
+                                    ]
+                                },
+                                {
+                                    "mark": {
+                                        "type": "rule",
+                                        "color": "firebrick",
+                                        "strokeDash": [
+                                            5,
+                                            5
+                                        ]
+                                    },
+                                    "encoding": {
+                                        "x": {
+                                            "aggregate": "min",
+                                            "field": "timestamp",
+                                            "type": "temporal"
+                                        },
+                                        "x2": {
+                                            "aggregate": "max",
+                                            "field": "timestamp"
+                                        },
+                                        "y": {
+                                            "aggregate": "min",
+                                            "field": "value",
+                                            "scale": {
+                                                "zero": false
+                                            },
+                                            "type": "quantitative"
+                                        }
+                                    },
+                                    "transform": [
+                                        {
+                                            "filter": {
+                                                "param": "param_11"
+                                            }
+                                        }
+                                    ]
+                                },
+                                {
+                                    "mark": {
+                                        "type": "text",
+                                        "color": "#1f77b4",
+                                        "dx": 0,
+                                        "dy": -50,
+                                        "size": 20
+                                    },
+                                    "encoding": {
+                                        "text": {
+                                            "aggregate": "mean",
+                                            "field": "value",
+                                            "format": ".3f",
+                                            "type": "quantitative"
+                                        },
+                                        "x": {
+                                            "aggregate": "mean",
+                                            "field": "timestamp",
+                                            "type": "temporal"
+                                        },
+                                        "y": {
+                                            "aggregate": "min",
+                                            "field": "value",
+                                            "scale": {
+                                                "zero": false
+                                            },
+                                            "type": "quantitative"
+                                        }
+                                    },
+                                    "transform": [
+                                        {
+                                            "filter": {
+                                                "param": "param_11"
+                                            }
+                                        }
+                                    ]
+                                },
+                                {
+                                    "mark": {
+                                        "type": "text",
+                                        "color": "firebrick",
+                                        "dx": 0,
+                                        "dy": -10,
+                                        "size": 14
+                                    },
+                                    "encoding": {
+                                        "text": {
+                                            "aggregate": "count",
+                                            "field": "value",
+                                            "format": ".3f",
+                                            "type": "quantitative"
+                                        },
+                                        "x": {
+                                            "aggregate": "mean",
+                                            "field": "timestamp",
+                                            "type": "temporal"
+                                        },
+                                        "y": {
+                                            "aggregate": "min",
+                                            "field": "value",
+                                            "scale": {
+                                                "zero": false
+                                            },
+                                            "type": "quantitative"
+                                        }
+                                    },
+                                    "transform": [
+                                        {
+                                            "filter": {
+                                                "param": "param_11"
+                                            }
+                                        }
+                                    ]
+                                },
+                                {
+                                    "mark": {
+                                        "type": "text",
+                                        "color": "firebrick",
+                                        "dx": -20,
+                                        "dy": -10,
+                                        "size": 14
+                                    },
+                                    "encoding": {
+                                        "text": {
+                                            "aggregate": "min",
+                                            "field": "timestamp",
+                                            "formatType": "time",
+                                            "timeUnit": "hoursminutesseconds",
+                                            "type": "temporal"
+                                        },
+                                        "x": {
+                                            "aggregate": "min",
+                                            "field": "timestamp",
+                                            "type": "temporal"
+                                        },
+                                        "y": {
+                                            "aggregate": "min",
+                                            "field": "value",
+                                            "scale": {
+                                                "zero": false
+                                            },
+                                            "type": "quantitative"
+                                        }
+                                    },
+                                    "transform": [
+                                        {
+                                            "filter": {
+                                                "param": "param_11"
+                                            }
+                                        }
+                                    ]
+                                },
+                                {
+                                    "mark": {
+                                        "type": "text",
+                                        "color": "firebrick",
+                                        "dx": 20,
+                                        "dy": -10,
+                                        "size": 14
+                                    },
+                                    "encoding": {
+                                        "text": {
+                                            "aggregate": "max",
+                                            "field": "timestamp",
+                                            "formatType": "time",
+                                            "timeUnit": "hoursminutesseconds",
+                                            "type": "temporal"
+                                        },
+                                        "x": {
+                                            "aggregate": "max",
+                                            "field": "timestamp",
+                                            "type": "temporal"
+                                        },
+                                        "y": {
+                                            "aggregate": "min",
+                                            "field": "value",
+                                            "scale": {
+                                                "zero": false
+                                            },
+                                            "type": "quantitative"
+                                        }
+                                    },
+                                    "transform": [
+                                        {
+                                            "filter": {
+                                                "param": "param_11"
+                                            }
+                                        }
+                                    ]
                                 }
-                            }
+                            ],
+                            "height": 200,
+                            "width": 800
                         },
+                        "params": [
+                            {
+                                "name": "param_11",
+                                "select": {
+                                    "type": "interval",
+                                    "encodings": [
+                                        "x"
+                                    ]
+                                },
+                                "views": [
+                                    "view_11"
+                                ]
+                            }
+                        ],
                         "resolve": {
                             "scale": {
+                                "x": "independent",
                                 "y": "independent"
                             }
-                        }
+                        },
+                        "spacing": 25,
+                        "$schema": "https://vega.github.io/schema/vega-lite/v5.20.1.json"
                     };
 
                     vegaEmbed("#vega-container", spec).catch(console.error);
