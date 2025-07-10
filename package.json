@@ -1,12 +1,27 @@
 {
   "name": "fit-viewer",
   "displayName": "FIT File Viewer",
-  "description": "A VSCode extension to preview .fit files",
+  "description": "A VSCode extension to preview .fit files with interactive maps, charts, and data tables",
   "version": "0.6.0",
+  "license": "MIT",
+  "keywords": [
+    "fit",
+    "garmin",
+    "fitness",
+    "gps",
+    "sports",
+    "data",
+    "visualization",
+    "viewer"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/thomascamminady/fit-viewer"
   },
+  "bugs": {
+    "url": "https://github.com/thomascamminady/fit-viewer/issues"
+  },
+  "homepage": "https://github.com/thomascamminady/fit-viewer#readme",
   "icon": "icon.png",
   "publisher": "thomascamminady",
   "author": "Thomas Camminady",
@@ -36,7 +51,17 @@
   "scripts": {
     "compile": "tsc -p ./ && npm run copy-assets",
     "copy-assets": "copyfiles -u 1 media/* out/media/",
-    "package": "vsce package"
+    "watch": "tsc -watch -p ./",
+    "package": "vsce package",
+    "lint": "eslint src/**/*.ts",
+    "lint:fix": "eslint src/**/*.ts --fix",
+    "format": "prettier --write 'src/**/*.{ts,js,json}'",
+    "format:check": "prettier --check 'src/**/*.{ts,js,json}'",
+    "clean": "rimraf out",
+    "rebuild": "npm run clean && npm run compile",
+    "pretest": "npm run compile && npm run lint",
+    "test": "node ./out/test/runTest.js",
+    "vscode:prepublish": "npm run compile"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.10",
@@ -44,7 +69,16 @@
     "@types/vscode": "^1.96.0",
     "@vscode/vsce": "^2.19.0",
     "typescript": "^5.7.3",
-    "copyfiles": "^2.4.1"
+    "copyfiles": "^2.4.1",
+    "eslint": "^9.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "prettier": "^3.0.0",
+    "rimraf": "^6.0.0",
+    "@vscode/test-cli": "^0.0.10",
+    "@vscode/test-electron": "^2.4.1",
+    "mocha": "^10.0.0",
+    "glob": "^11.0.0"
   },
   "dependencies": {
     "@garmin/fitsdk": "^21.161.0",
