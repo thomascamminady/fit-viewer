@@ -1,7 +1,9 @@
 .vscode/**
 .vscode-test/**
 src/**
+out/test/**
 .gitignore
+.gitattributes
 .yarnrc
 vsc-extension-quickstart.md
 **/tsconfig.json
@@ -9,3 +11,29 @@ vsc-extension-quickstart.md
 **/*.map
 **/*.ts
 **/.vscode-test.*
+
+# Development files
+.editorconfig
+.prettierrc.json
+.prettierignore
+.nvmrc
+
+# Documentation development files
+CONTRIBUTING.md
+IMPROVEMENTS.md
+
+# Python visualization (not needed in extension)
+vis/**
+
+# CI/CD files
+.github/**
+
+# npm files
+.npmrc
+node_modules/**/.npmrc
+
+# Lock files
+package-lock.json
+
+# OS files
+**/.DS_Store
