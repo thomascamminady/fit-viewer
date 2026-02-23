@@ -1,225 +1,1317 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
-    <!-- Load jQuery first, then DataTables, then Arquero, then Chart.js, Vega, Vega-Lite, Vega-Embed -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline' 'unsafe-eval' https://code.jquery.com https://cdn.datatables.net https://unpkg.com https://cdn.jsdelivr.net; style-src 'unsafe-inline' https://cdn.datatables.net https://unpkg.com https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src https: data:; connect-src https:;">
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.datatables.net/2.2.1/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/3.1.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/3.1.2/js/buttons.html5.min.js"></script>
     <script src="https://unpkg.com/arquero"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
     <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
     <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
     <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
     <link rel="stylesheet" href="https://cdn.datatables.net/2.2.1/css/jquery.dataTables.min.css">
-
-    <!-- Load Leaflet CSS and JS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.1.2/css/buttons.dataTables.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
 
-    <!-- Our unified styles -->
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap');
+
+        :root {
+            --bg-primary: var(--vscode-editor-background, #ffffff);
+            --bg-secondary: var(--vscode-sideBar-background, #f5f5f5);
+            --bg-card: var(--vscode-editorWidget-background, #ffffff);
+            --text-primary: var(--vscode-editor-foreground, #333333);
+            --text-secondary: var(--vscode-descriptionForeground, #666666);
+            --border-color: var(--vscode-widget-border, #dee2e6);
+            --accent-color: var(--vscode-button-background, #2196F3);
+            --accent-hover: var(--vscode-button-hoverBackground, #1976D2);
+            --accent-fg: var(--vscode-button-foreground, #ffffff);
+            --hover-bg: var(--vscode-list-hoverBackground, #e3f2fd);
+            --input-bg: var(--vscode-input-background, #ffffff);
+            --input-border: var(--vscode-input-border, #cccccc);
+            --input-fg: var(--vscode-input-foreground, #333333);
+        }
 
         body {
             font-family: 'Open Sans', sans-serif;
             padding: 10px;
             font-size: 14px;
-            background-color: #ffffff;
-            color: #333;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
             margin: 0;
         }
 
-        h2 {
-            margin-bottom: 20px;
-            color: #333;
-        }
+        h2, h3, h4 { color: var(--text-primary); margin-bottom: 12px; }
 
-        /* Tabs styling */
-        #tabs {
-            margin-bottom: 15px;
-        }
+        #tabs { margin-bottom: 15px; display: flex; gap: 5px; flex-wrap: wrap; }
 
         .tab-button {
             padding: 10px 20px;
             cursor: pointer;
-            background: #2196F3;
+            background: var(--accent-color);
             border: none;
             border-radius: 4px;
-            margin-right: 5px;
-            color: #fff;
+            color: var(--accent-fg);
             font-weight: 600;
             transition: background 0.3s, box-shadow 0.3s;
         }
 
-        .tab-button:hover,
-        .tab-button.active {
-            background: #1976D2;
+        .tab-button:hover, .tab-button.active {
+            background: var(--accent-hover);
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
 
-        /* Tab content */
-        .tab-content {
-            display: none;
-        }
+        .tab-content { display: none; }
 
-        /* Data Tables styling */
         .table-section {
-            border: 1px solid #ccc;
-            background: #fff;
+            border: 1px solid var(--border-color);
+            background: var(--bg-card);
             margin-bottom: 15px;
             border-radius: 4px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
         .table-header {
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            background: #ffffff;
+            font-size: 16px; font-weight: 600; cursor: pointer;
+            background: var(--bg-card);
             padding: 10px 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            display: flex; justify-content: space-between; align-items: center;
             border-radius: 4px 4px 0 0;
-            color: #333;
+            color: var(--text-primary);
             transition: background 0.3s;
         }
 
-        .table-header:hover {
-            background: #ddd;
-        }
+        .table-header:hover { background: var(--hover-bg); }
 
         .copy-btn {
-            font-size: 12px;
-            padding: 6px 12px;
-            background: #2196F3;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            margin-right: 10px;
-            transition: background 0.3s;
+            font-size: 12px; padding: 6px 12px;
+            background: var(--accent-color); color: var(--accent-fg);
+            border: none; border-radius: 4px; cursor: pointer;
+            margin-right: 10px; transition: background 0.3s;
         }
 
-        .copy-btn:hover {
-            background: #1976D2;
-        }
+        .copy-btn:hover { background: var(--accent-hover); }
 
-        .table-content {
-            overflow-x: auto;
+        .table-content { overflow-x: auto; padding: 15px; }
+
+        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        th, td { border: 1px solid var(--border-color); padding: 8px; text-align: left; color: var(--text-primary); }
+        th { background: var(--bg-secondary); }
+        tr:nth-child(even) { background: var(--bg-secondary); }
+        tr:hover { background: var(--hover-bg) !important; transition: background 0.2s; }
+
+        #chart-container { width: 100%; min-height: 600px; }
+
+        .analytics-panel {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
             padding: 15px;
+            margin-bottom: 20px;
         }
 
-        /* Table styling */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 14px;
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px;
+            margin-bottom: 15px;
         }
 
-        th,
-        td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-
-        th {
-            background: #f0f0f0;
-        }
-
-        tr:nth-child(even) {
-            background: #fafafa;
-        }
-
-        tr:hover {
-            background: #e3f2fd !important;
-            transition: background 0.2s;
-        }
-
-        /* Chart container styling */
-        #chart-container {
-            width: 100%;
-            height: 400px;
-        }
-
-        /* Footer styling */
-        footer {
-            margin-top: 20px;
-            font-size: 12px;
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 15px;
             text-align: center;
-            color: #555;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
         }
+
+        .stat-value { font-size: 22px; font-weight: bold; color: var(--accent-color); margin-bottom: 4px; }
+        .stat-label { font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
+        .stat-unit { font-size: 13px; color: var(--text-secondary); }
+
+        .filter-controls {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .filter-row { display: flex; gap: 15px; align-items: center; flex-wrap: wrap; }
+
+        .filter-group { display: flex; flex-direction: column; gap: 5px; }
+        .filter-group label { font-size: 12px; font-weight: bold; color: var(--text-secondary); }
+        .filter-group select, .filter-group input {
+            padding: 6px 10px;
+            border: 1px solid var(--input-border);
+            border-radius: 4px;
+            font-size: 14px;
+            background: var(--input-bg);
+            color: var(--input-fg);
+        }
+
+        .chart-controls {
+            margin-bottom: 15px; padding: 10px;
+            background: var(--bg-secondary); border-radius: 4px;
+        }
+
+        .chart-type-btn {
+            padding: 8px 16px; margin-right: 8px; margin-bottom: 4px;
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: 4px; cursor: pointer; color: var(--text-primary);
+            transition: all 0.3s;
+        }
+
+        .chart-type-btn.active {
+            background: var(--accent-color); color: var(--accent-fg);
+            border-color: var(--accent-color);
+        }
+
+        .map-controls {
+            position: absolute; top: 10px; right: 10px; z-index: 1000;
+            background: var(--bg-card); padding: 8px; border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .map-controls button {
+            display: block; width: 100%; margin-bottom: 4px;
+            padding: 6px 10px; border: 1px solid var(--border-color);
+            background: var(--bg-card); color: var(--text-primary);
+            cursor: pointer; border-radius: 3px; font-size: 12px;
+        }
+
+        .map-controls button:hover { background: var(--hover-bg); }
+        .map-controls button.active { background: var(--accent-color); color: var(--accent-fg); border-color: var(--accent-color); }
+
+        .chart-wrapper { position: relative; width: 100%; }
+
+        .analytics-section {
+            margin-bottom: 25px; padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .analytics-section:last-child { border-bottom: none; }
+
+        .analytics-table {
+            width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 15px;
+        }
+        .analytics-table th {
+            background: var(--bg-secondary); color: var(--text-primary);
+            padding: 8px 12px; text-align: right;
+            border-bottom: 2px solid var(--border-color);
+        }
+        .analytics-table th:first-child { text-align: left; }
+        .analytics-table td {
+            padding: 6px 12px; text-align: right;
+            border-bottom: 1px solid var(--border-color); color: var(--text-primary);
+        }
+        .analytics-table td:first-child { text-align: left; font-weight: 600; }
+        .analytics-table tr:hover { background: var(--hover-bg); }
+
+        .comparison-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .comparison-card {
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: 6px; padding: 15px;
+        }
+        .comparison-card h4 { margin: 0 0 10px 0; color: var(--text-secondary); font-size: 13px; text-transform: uppercase; }
+        .delta-positive { color: #0d9488; font-weight: 600; }
+        .delta-negative { color: #dc2626; font-weight: 600; }
+
+        .colormap-selector {
+            display: flex; gap: 8px; align-items: center; padding: 8px 12px;
+            background: var(--bg-secondary); border-radius: 4px; margin-bottom: 12px;
+        }
+        .colormap-selector label { font-size: 12px; font-weight: 600; color: var(--text-secondary); }
+        .colormap-selector select {
+            padding: 4px 8px; border: 1px solid var(--input-border); border-radius: 4px;
+            background: var(--input-bg); color: var(--input-fg); font-size: 13px;
+        }
+        .colormap-preview {
+            height: 12px; width: 120px; border-radius: 3px; display: inline-block; vertical-align: middle;
+        }
+
+        footer { margin-top: 20px; font-size: 12px; text-align: center; color: var(--text-secondary); }
+        footer a { color: var(--accent-color); }
     </style>
 
     <script>
-        let globalData = null; // will hold all data received from the extension
+        let globalData = null;
+        let currentMap = null;
+        let currentPolyline = null;
+        let currentRouteLayers = [];
+        let mapColorMode = 'none';
+        let selectedColormap = 'tableau10';
+        let elevationChart = null;
+        let speedHrChart = null;
+        let overviewZonesChart = null;
+        let performanceChart = null;
+        let lapChart = null;
+        let hrZoneBarChart = null;
+        let hrZoneDonutChart = null;
+        let powerZoneChart = null;
+        let splitChart = null;
+
+        // ---- Utility functions ----
+
+        function downsample(records, maxPoints = 2000) {
+            if (records.length <= maxPoints) return records;
+            const step = Math.ceil(records.length / maxPoints);
+            return records.filter((_, i) => i % step === 0);
+        }
+
+        function getThemeColors() {
+            const s = getComputedStyle(document.documentElement);
+            return {
+                text: s.getPropertyValue('--text-primary').trim() || '#333',
+                textSec: s.getPropertyValue('--text-secondary').trim() || '#666',
+                grid: s.getPropertyValue('--border-color').trim() || '#ddd',
+                bg: s.getPropertyValue('--bg-card').trim() || '#fff',
+                accent: s.getPropertyValue('--accent-color').trim() || '#2196F3'
+            };
+        }
+
+        function chartBaseOptions(overrides = {}) {
+            const c = getThemeColors();
+            return {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { labels: { color: c.text }, ...(overrides.legend || {}) },
+                    ...(overrides.plugins || {})
+                },
+                scales: {
+                    x: { ticks: { color: c.text }, grid: { color: c.grid + '40' }, ...(overrides.x || {}) },
+                    y: { ticks: { color: c.text }, grid: { color: c.grid + '40' }, ...(overrides.y || {}) },
+                    ...(overrides.extraScales || {})
+                },
+                ...(overrides.root || {})
+            };
+        }
+
+        function getFieldValue(r, primary, fallback) {
+            return r[primary] != null ? r[primary] : (fallback ? r[fallback] : null);
+        }
+
+        // Filter NaN/Infinity from numeric arrays — prevents one bad sample from poisoning everything
+        function validNumbers(arr) {
+            return arr.filter(v => typeof v === 'number' && isFinite(v));
+        }
+
+        function getMetricValue(record, metric) {
+            let v;
+            switch(metric) {
+                case 'speed':
+                    v = record.enhancedSpeed != null ? record.enhancedSpeed : record.speed;
+                    return (v != null && isFinite(v)) ? v * 3.6 : null;
+                case 'heartRate': v = record.heartRate; break;
+                case 'power': v = record.power; break;
+                case 'cadence': v = record.cadence; break;
+                case 'altitude':
+                    v = record.enhancedAltitude != null ? record.enhancedAltitude : record.altitude;
+                    break;
+                default: return null;
+            }
+            return (v != null && isFinite(v)) ? v : null;
+        }
+
+        function getMetricUnit(metric) {
+            switch(metric) {
+                case 'speed': return 'km/h';
+                case 'heartRate': return 'bpm';
+                case 'power': return 'W';
+                case 'cadence': return 'rpm';
+                case 'altitude': return 'm';
+                default: return '';
+            }
+        }
+
+        function formatDuration(seconds) {
+            if (!isFinite(seconds) || seconds < 0) return '0:00';
+            let totalSec = Math.round(seconds);
+            const h = Math.floor(totalSec / 3600);
+            const m = Math.floor((totalSec % 3600) / 60);
+            const s = totalSec % 60;
+            return h > 0
+                ? `${h}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`
+                : `${m}:${s.toString().padStart(2,'0')}`;
+        }
+
+        function formatPace(kmh) {
+            if (!kmh || kmh <= 0 || !isFinite(kmh)) return '--:--';
+            let totalSec = Math.round(3600 / kmh);
+            const m = Math.floor(totalSec / 60);
+            const s = totalSec % 60;
+            return `${m}:${s.toString().padStart(2,'0')}`;
+        }
+
+        function createStatCard(value, label, unit) {
+            return `<div class="stat-card">
+                <div class="stat-value">${value}</div>
+                <div class="stat-label">${label}</div>
+                ${unit ? `<div class="stat-unit">${unit}</div>` : ''}
+            </div>`;
+        }
+
+        function calculateElevationGain(elevations) {
+            let gain = 0;
+            for (let i = 1; i < elevations.length; i++) {
+                const diff = elevations[i] - elevations[i-1];
+                if (diff > 0) gain += diff;
+            }
+            return Math.round(gain);
+        }
+
+        // ---- Colormap system ----
+        // Sequential: arrays of [r,g,b] stops interpolated from 0..1
+        // Tabular: discrete color arrays (sampled as even steps)
+        const COLORMAPS = {
+            // Tabular palettes — distinct, high-contrast discrete colors
+            tableau10:  [[78,121,167],[242,142,44],[225,87,89],[118,183,178],[89,161,79],[237,201,73],[175,122,161],[255,157,167],[156,117,95],[186,176,172]],
+            bold:       [[30,100,200],[220,60,60],[40,180,100],[180,100,220],[255,160,40],[0,170,180],[200,50,130],[100,100,100],[160,200,30],[100,60,160]],
+            ocean:      [[3,37,76],[0,80,130],[0,120,160],[20,160,175],[60,195,175],[120,215,165],[175,230,155],[210,240,160],[235,248,180],[250,255,210]],
+            sunset:     [[54,75,154],[74,123,183],[110,166,205],[152,202,225],[194,228,239],[234,236,204],[254,218,139],[253,179,102],[246,126,75],[221,61,45],[165,0,38]],
+            // Scientific sequential colormaps
+            viridis:    [[68,1,84],[72,35,116],[64,67,135],[52,94,141],[41,120,142],[32,144,140],[34,167,132],[68,190,112],[121,209,81],[189,222,38],[253,231,37]],
+            inferno:    [[0,0,4],[22,11,57],[66,10,104],[106,23,110],[147,38,103],[186,54,85],[221,81,58],[243,118,27],[252,165,10],[246,215,70],[252,255,164]],
+            magma:      [[0,0,4],[18,13,60],[51,16,104],[89,17,123],[128,29,126],[163,48,120],[199,69,107],[231,104,86],[248,149,64],[253,202,53],[252,253,191]],
+            plasma:     [[13,8,135],[75,3,161],[126,3,168],[168,34,150],[199,63,125],[222,92,99],[241,121,75],[253,155,49],[253,191,35],[240,228,66],[240,249,33]],
+            cividis:    [[0,32,77],[0,52,110],[39,72,108],[72,90,100],[99,107,95],[124,123,93],[150,140,85],[179,158,71],[209,179,52],[237,201,31],[253,231,37]],
+            turbo:      [[48,18,59],[70,68,172],[62,131,224],[35,187,219],[30,226,170],[62,248,116],[131,252,63],[198,237,34],[244,203,29],[255,152,34],[226,75,43]]
+        };
+
+        function getColormapColor(t, cmName) {
+            const cm = COLORMAPS[cmName || selectedColormap] || COLORMAPS.viridis;
+            t = Math.max(0, Math.min(1, t));
+            const idx = t * (cm.length - 1);
+            const lo = Math.floor(idx);
+            const hi = Math.min(lo + 1, cm.length - 1);
+            const f = idx - lo;
+            const r = Math.round(cm[lo][0] + f * (cm[hi][0] - cm[lo][0]));
+            const g = Math.round(cm[lo][1] + f * (cm[hi][1] - cm[lo][1]));
+            const b = Math.round(cm[lo][2] + f * (cm[hi][2] - cm[lo][2]));
+            return `rgb(${r},${g},${b})`;
+        }
+
+        function getColormapHex(t, cmName) {
+            const cm = COLORMAPS[cmName || selectedColormap] || COLORMAPS.viridis;
+            t = Math.max(0, Math.min(1, t));
+            const idx = t * (cm.length - 1);
+            const lo = Math.floor(idx);
+            const hi = Math.min(lo + 1, cm.length - 1);
+            const f = idx - lo;
+            const r = Math.round(cm[lo][0] + f * (cm[hi][0] - cm[lo][0]));
+            const g = Math.round(cm[lo][1] + f * (cm[hi][1] - cm[lo][1]));
+            const b = Math.round(cm[lo][2] + f * (cm[hi][2] - cm[lo][2]));
+            return '#' + [r,g,b].map(x => x.toString(16).padStart(2,'0')).join('');
+        }
+
+        // Sample N evenly-spaced colors from the active colormap
+        function getColormapColors(n, cmName) {
+            const colors = [];
+            for (let i = 0; i < n; i++) {
+                colors.push(getColormapHex(i / Math.max(1, n - 1), cmName));
+            }
+            return colors;
+        }
+
+        // Map a value in [min, max] to a colormap color
+        function interpolateColor(value, min, max) {
+            const t = (max - min) === 0 ? 0.5 : (value - min) / (max - min);
+            return getColormapColor(t);
+        }
+
+        function getHRZones(heartRates) {
+            const clean = validNumbers(heartRates);
+            if (clean.length === 0) return [];
+            const maxHR = Math.max(...clean);
+            const colors = getColormapColors(5);
+            return [
+                { zone: 'Z1 Recovery', min: 0, max: maxHR * 0.6, color: colors[0] },
+                { zone: 'Z2 Endurance', min: maxHR * 0.6, max: maxHR * 0.7, color: colors[1] },
+                { zone: 'Z3 Tempo', min: maxHR * 0.7, max: maxHR * 0.8, color: colors[2] },
+                { zone: 'Z4 Threshold', min: maxHR * 0.8, max: maxHR * 0.9, color: colors[3] },
+                { zone: 'Z5 Max', min: maxHR * 0.9, max: maxHR * 1.01, color: colors[4] }
+            ];
+        }
+
+        function getPowerZones(estFTP) {
+            const colors = getColormapColors(6);
+            return [
+                { zone: 'Z1 Recovery', min: 0, max: estFTP * 0.55, color: colors[0] },
+                { zone: 'Z2 Endurance', min: estFTP * 0.55, max: estFTP * 0.75, color: colors[1] },
+                { zone: 'Z3 Tempo', min: estFTP * 0.75, max: estFTP * 0.90, color: colors[2] },
+                { zone: 'Z4 Threshold', min: estFTP * 0.90, max: estFTP * 1.05, color: colors[3] },
+                { zone: 'Z5 VO2max', min: estFTP * 1.05, max: estFTP * 1.20, color: colors[4] },
+                { zone: 'Z6 Anaerobic', min: estFTP * 1.20, max: Infinity, color: colors[5] }
+            ];
+        }
+
+        function buildColormapPreviewCSS(cmName) {
+            const cm = COLORMAPS[cmName] || COLORMAPS.viridis;
+            const stops = cm.map((c, i) => `rgb(${c.join(',')}) ${Math.round(i / (cm.length - 1) * 100)}%`).join(', ');
+            return `linear-gradient(to right, ${stops})`;
+        }
+
+        // ---- Main ----
 
         window.onload = () => {
-            // Signal to the extension that the webview is ready
             const vscode = acquireVsCodeApi();
             vscode.postMessage({ type: "ready" });
 
-            // Default: show the Data tab
-            document.getElementById("content-data").style.display = "none";
-            document.getElementById("content-chart").style.display = "none";
-            document.getElementById("content-map").style.display = "block";
+            showTab("overview");
 
-            // Tab button click handlers
-            document.getElementById("tab-data").onclick = () => {
-                document.getElementById("content-data").style.display = "block";
-                document.getElementById("content-chart").style.display = "none";
-                document.getElementById("content-map").style.display = "none";
-                setActiveTab("tab-data");
+            document.getElementById("tab-overview").onclick = () => showTab("overview");
+            document.getElementById("tab-map").onclick = () => showTab("map");
+            document.getElementById("tab-analytics").onclick = () => showTab("analytics");
+            document.getElementById("tab-data").onclick = () => showTab("data");
+            document.getElementById("tab-chart").onclick = () => showTab("chart");
+
+            document.querySelectorAll('.chart-type-btn').forEach(btn => {
+                btn.onclick = () => {
+                    document.querySelectorAll('.chart-type-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    renderAdvancedChart(btn.dataset.type);
+                };
+            });
+
+            document.getElementById("analysis-metric").onchange = updateMetricExplorer;
+            document.getElementById("time-range").oninput = updateMetricExplorer;
+            document.getElementById("smoothing").onchange = updateMetricExplorer;
+
+            // Colormap selector
+            const cmPreview = document.getElementById('colormap-preview');
+            cmPreview.style.background = buildColormapPreviewCSS(selectedColormap);
+            document.getElementById('colormap-select').onchange = function() {
+                selectedColormap = this.value;
+                cmPreview.style.background = buildColormapPreviewCSS(selectedColormap);
+                refreshAllVisuals();
             };
 
-            document.getElementById("tab-chart").onclick = () => {
-                document.getElementById("content-data").style.display = "none";
-                document.getElementById("content-chart").style.display = "block";
-                document.getElementById("content-map").style.display = "none";
-                setActiveTab("tab-chart");
-                renderChart();
-            };
-
-            document.getElementById("tab-map").onclick = () => {
-                document.getElementById("content-data").style.display = "none";
-                document.getElementById("content-chart").style.display = "none";
-                document.getElementById("content-map").style.display = "block";
-                setActiveTab("tab-map");
-                renderMap();
-            };
-
-            function setActiveTab(tabId) {
-                document.querySelectorAll(".tab-button").forEach(btn => {
-                    btn.classList.remove("active");
-                });
-                document.getElementById(tabId).classList.add("active");
+            function refreshAllVisuals() {
+                if (!globalData) return;
+                safeCall(renderOverview, 'renderOverview');
+                if (currentMap && currentPolyline) safeCall(renderMapRoute, 'renderMapRoute');
+                if (document.getElementById("tab-analytics").classList.contains("active")) safeCall(renderAnalytics, 'renderAnalytics');
+                if (document.getElementById("tab-chart").classList.contains("active")) {
+                    const activeBtn = document.querySelector('.chart-type-btn.active');
+                    if (activeBtn) safeCall(() => renderAdvancedChart(activeBtn.dataset.type), 'renderAdvancedChart');
+                }
             }
 
-            // Listen for fitData message from the extension
+            // Map button handlers
+            document.getElementById("btn-fit-route").onclick = () => {
+                if (currentMap && currentPolyline) currentMap.fitBounds(currentPolyline.getBounds());
+            };
+            document.getElementById("btn-color-elevation").onclick = () => {
+                mapColorMode = mapColorMode === 'elevation' ? 'none' : 'elevation';
+                document.getElementById("btn-color-elevation").classList.toggle('active', mapColorMode === 'elevation');
+                document.getElementById("btn-color-speed").classList.remove('active');
+                renderMapRoute();
+            };
+            document.getElementById("btn-color-speed").onclick = () => {
+                mapColorMode = mapColorMode === 'speed' ? 'none' : 'speed';
+                document.getElementById("btn-color-speed").classList.toggle('active', mapColorMode === 'speed');
+                document.getElementById("btn-color-elevation").classList.remove('active');
+                renderMapRoute();
+            };
+            document.getElementById("btn-export-gpx").onclick = exportGPX;
+
+            function showTab(tabName) {
+                document.querySelectorAll(".tab-content").forEach(c => c.style.display = "none");
+                document.querySelectorAll(".tab-button").forEach(b => b.classList.remove("active"));
+                document.getElementById(`content-${tabName}`).style.display = "block";
+                document.getElementById(`tab-${tabName}`).classList.add("active");
+
+                switch(tabName) {
+                    case 'map': setTimeout(renderMap, 100); break;
+                    case 'chart': setTimeout(() => renderAdvancedChart('time-series'), 100); break;
+                    case 'analytics': setTimeout(renderAnalytics, 100); break;
+                    case 'overview': setTimeout(renderOverview, 100); break;
+                }
+            }
+
+            // Safe wrapper to prevent one failing section from breaking others
+            function safeCall(fn, label) {
+                try { fn(); } catch(e) { console.warn('[FIT Viewer]', label, 'error:', e); }
+            }
+
             window.addEventListener("message", event => {
                 const message = event.data;
                 if (message.type === "fitData") {
                     globalData = message.data;
                     setTimeout(() => {
-                        displayTables(globalData);
-                        if (document.getElementById("tab-chart").classList.contains("active")) {
-                            renderChart();
-                        }
-                        if (document.getElementById("tab-map").classList.contains("active")) {
-                            renderMap();
-                        }
+                        safeCall(() => displayTables(globalData), 'displayTables');
+                        safeCall(renderOverview, 'renderOverview');
+                        if (document.getElementById("tab-map").classList.contains("active")) safeCall(renderMap, 'renderMap');
+                        if (document.getElementById("tab-chart").classList.contains("active")) safeCall(() => renderAdvancedChart('time-series'), 'renderAdvancedChart');
+                        if (document.getElementById("tab-analytics").classList.contains("active")) safeCall(renderAnalytics, 'renderAnalytics');
                     }, 0);
                 }
             });
 
+            // ==============================
+            // OVERVIEW TAB
+            // ==============================
+
+            function calculateStats(data) {
+                if (!data || !data.recordMesgs) return {};
+                const records = data.recordMesgs;
+                const stats = {};
+
+                if (records.length > 0) {
+                    const st = new Date(records[0].timestamp);
+                    const et = new Date(records[records.length - 1].timestamp);
+                    stats.duration = Math.round((et - st) / 1000);
+                }
+
+                const distances = validNumbers(records.map(r => r.distance));
+                if (distances.length > 0) stats.distance = Math.max(...distances);
+
+                const speeds = validNumbers(records.map(r => {
+                    const v = r.enhancedSpeed != null ? r.enhancedSpeed : r.speed;
+                    return v != null ? v * 3.6 : NaN;
+                }));
+                if (speeds.length > 0) {
+                    stats.avgSpeed = speeds.reduce((a, b) => a + b, 0) / speeds.length;
+                    stats.maxSpeed = Math.max(...speeds);
+                }
+
+                const hrs = validNumbers(records.map(r => r.heartRate));
+                if (hrs.length > 0) {
+                    stats.avgHeartRate = Math.round(hrs.reduce((a, b) => a + b, 0) / hrs.length);
+                    stats.maxHeartRate = Math.max(...hrs);
+                }
+
+                const elevs = validNumbers(records.map(r => r.enhancedAltitude != null ? r.enhancedAltitude : r.altitude));
+                if (elevs.length > 0) {
+                    stats.minElevation = Math.min(...elevs);
+                    stats.maxElevation = Math.max(...elevs);
+                    stats.elevationGain = calculateElevationGain(elevs);
+                }
+
+                const powers = validNumbers(records.map(r => r.power));
+                if (powers.length > 0) {
+                    stats.avgPower = Math.round(powers.reduce((a, b) => a + b, 0) / powers.length);
+                    stats.maxPower = Math.max(...powers);
+                }
+
+                const cadences = validNumbers(records.map(r => r.cadence));
+                if (cadences.length > 0) {
+                    stats.avgCadence = Math.round(cadences.reduce((a, b) => a + b, 0) / cadences.length);
+                }
+
+                // Session-level stats
+                if (data.sessionMesgs && data.sessionMesgs.length > 0) {
+                    const s = data.sessionMesgs[0];
+                    if (s.totalCalories != null && isFinite(s.totalCalories)) stats.calories = s.totalCalories;
+                    if (s.totalTrainingEffect != null && isFinite(s.totalTrainingEffect)) stats.trainingEffect = s.totalTrainingEffect;
+                }
+
+                const temps = validNumbers(records.map(r => r.temperature));
+                if (temps.length > 0) {
+                    stats.avgTemp = Math.round(temps.reduce((a, b) => a + b, 0) / temps.length);
+                }
+
+                return stats;
+            }
+
+            function renderOverview() {
+                if (!globalData || !globalData.recordMesgs) return;
+                const stats = calculateStats(globalData);
+                const el = document.getElementById('overview-stats');
+                let html = '';
+
+                if (stats.duration) html += createStatCard(formatDuration(stats.duration), 'Duration');
+                if (stats.distance) html += createStatCard((stats.distance / 1000).toFixed(2), 'Distance', 'km');
+                if (stats.avgSpeed) html += createStatCard(stats.avgSpeed.toFixed(1), 'Avg Speed', 'km/h');
+                if (stats.maxSpeed) html += createStatCard(stats.maxSpeed.toFixed(1), 'Max Speed', 'km/h');
+                if (stats.avgSpeed) html += createStatCard(formatPace(stats.avgSpeed), 'Avg Pace', 'min/km');
+                if (stats.avgHeartRate) html += createStatCard(stats.avgHeartRate, 'Avg HR', 'bpm');
+                if (stats.maxHeartRate) html += createStatCard(stats.maxHeartRate, 'Max HR', 'bpm');
+                if (stats.elevationGain) html += createStatCard(stats.elevationGain, 'Elev Gain', 'm');
+                if (stats.avgPower) html += createStatCard(stats.avgPower, 'Avg Power', 'W');
+                if (stats.avgCadence) html += createStatCard(stats.avgCadence, 'Avg Cadence', 'rpm');
+                if (stats.calories) html += createStatCard(stats.calories, 'Calories', 'kcal');
+                if (stats.avgTemp != null) html += createStatCard(stats.avgTemp, 'Avg Temp', 'C');
+
+                el.innerHTML = html;
+                safeCall(renderElevationChart, 'renderElevationChart');
+                safeCall(renderSpeedHrChart, 'renderSpeedHrChart');
+                safeCall(renderOverviewZonesChart, 'renderOverviewZonesChart');
+            }
+
+            function renderElevationChart() {
+                if (!globalData || !globalData.recordMesgs) return;
+                const records = downsample(globalData.recordMesgs.filter(r =>
+                    (r.enhancedAltitude != null || r.altitude != null) && r.distance != null
+                ));
+                if (records.length === 0) return;
+                const ctx = document.getElementById('elevation-chart').getContext('2d');
+                if (elevationChart) elevationChart.destroy();
+                const c = getThemeColors();
+
+                elevationChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: records.map(r => (r.distance / 1000).toFixed(1)),
+                        datasets: [{
+                            label: 'Elevation (m)',
+                            data: records.map(r => r.enhancedAltitude != null ? r.enhancedAltitude : r.altitude),
+                            borderColor: c.accent,
+                            backgroundColor: c.accent + '20',
+                            fill: true, tension: 0.1, pointRadius: 0, borderWidth: 1.5
+                        }]
+                    },
+                    options: chartBaseOptions({
+                        legend: { display: false },
+                        x: { title: { display: true, text: 'Distance (km)', color: c.text } },
+                        y: { title: { display: true, text: 'Elevation (m)', color: c.text } }
+                    })
+                });
+            }
+
+            function renderSpeedHrChart() {
+                if (!globalData || !globalData.recordMesgs) return;
+                const records = downsample(globalData.recordMesgs.filter(r =>
+                    (r.enhancedSpeed != null || r.speed != null) && r.distance != null
+                ));
+                if (records.length === 0) return;
+                const ctx = document.getElementById('speed-hr-chart').getContext('2d');
+                if (speedHrChart) speedHrChart.destroy();
+                const c = getThemeColors();
+
+                const hasHR = records.some(r => r.heartRate != null);
+                const cmColors = getColormapColors(3);
+                const speedColor = cmColors[0];
+                const hrColor = cmColors[2];
+
+                const datasets = [{
+                    label: 'Speed (km/h)',
+                    data: records.map(r => ((r.enhancedSpeed != null ? r.enhancedSpeed : r.speed) || 0) * 3.6),
+                    borderColor: speedColor,
+                    backgroundColor: speedColor + '20',
+                    fill: false, tension: 0.1, pointRadius: 0, borderWidth: 1.5,
+                    yAxisID: 'y'
+                }];
+
+                const extraScales = {};
+                if (hasHR) {
+                    datasets.push({
+                        label: 'Heart Rate (bpm)',
+                        data: records.map(r => r.heartRate),
+                        borderColor: hrColor,
+                        backgroundColor: hrColor + '20',
+                        fill: false, tension: 0.1, pointRadius: 0, borderWidth: 1.5,
+                        yAxisID: 'y1'
+                    });
+                    extraScales.y1 = {
+                        type: 'linear', display: true, position: 'right',
+                        title: { display: true, text: 'Heart Rate (bpm)', color: c.text },
+                        ticks: { color: hrColor },
+                        grid: { drawOnChartArea: false }
+                    };
+                }
+
+                speedHrChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: records.map(r => (r.distance / 1000).toFixed(1)),
+                        datasets
+                    },
+                    options: chartBaseOptions({
+                        legend: { display: true },
+                        x: { title: { display: true, text: 'Distance (km)', color: c.text } },
+                        y: { title: { display: true, text: 'Speed (km/h)', color: c.text }, position: 'left' },
+                        extraScales
+                    })
+                });
+            }
+
+            function renderOverviewZonesChart() {
+                if (!globalData || !globalData.recordMesgs) return;
+                const heartRates = validNumbers(globalData.recordMesgs.map(r => r.heartRate));
+                if (heartRates.length === 0) {
+                    document.getElementById('overview-zones-wrapper').style.display = 'none';
+                    return;
+                }
+                document.getElementById('overview-zones-wrapper').style.display = 'block';
+                const ctx = document.getElementById('overview-zones-chart').getContext('2d');
+                if (overviewZonesChart) overviewZonesChart.destroy();
+
+                const zones = getHRZones(heartRates);
+                const zoneData = zones.map(z => heartRates.filter(hr => hr >= z.min && hr < z.max).length);
+                const totalTime = heartRates.length;
+
+                overviewZonesChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: zones.map(z => z.zone),
+                        datasets: [{
+                            data: zoneData,
+                            backgroundColor: zones.map(z => z.color),
+                            borderWidth: 1,
+                            borderColor: getThemeColors().bg
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'right', labels: { color: getThemeColors().text } },
+                            tooltip: {
+                                callbacks: {
+                                    label: (ctx) => {
+                                        const v = ctx.raw;
+                                        const pct = ((v / totalTime) * 100).toFixed(1);
+                                        return `${ctx.label}: ${formatDuration(v)} (${pct}%)`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // ==============================
+            // MAP TAB
+            // ==============================
+
+            function renderMap() {
+                if (!globalData || !globalData.recordMesgs) return;
+                if (typeof L === 'undefined') { console.warn('[FIT Viewer] Leaflet not loaded'); return; }
+
+                if (currentMap) {
+                    currentMap.invalidateSize();
+                    if (currentPolyline) return;
+                }
+
+                if (!currentMap) {
+                    const container = document.getElementById('leaflet-map');
+                    container.style.height = 'calc(100vh - 130px)';
+                    container.style.minHeight = '500px';
+                    currentMap = L.map('leaflet-map').setView([0, 0], 2);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '&copy; OpenStreetMap contributors'
+                    }).addTo(currentMap);
+                }
+
+                renderMapRoute();
+            }
+
+            function renderMapRoute() {
+                if (!currentMap || !globalData || !globalData.recordMesgs) return;
+
+                // Clear existing route layers
+                currentRouteLayers.forEach(l => currentMap.removeLayer(l));
+                currentRouteLayers = [];
+                if (currentPolyline) { currentMap.removeLayer(currentPolyline); currentPolyline = null; }
+
+                const recs = globalData.recordMesgs.filter(r => r.positionLat != null && r.positionLong != null);
+                if (recs.length === 0) return;
+
+                const coords = recs.map(r => [r.positionLat / Math.pow(2,31) * 180, r.positionLong / Math.pow(2,31) * 180]);
+
+                if (mapColorMode === 'none') {
+                    currentPolyline = L.polyline(coords, { color: getColormapHex(0.5), weight: 3 }).addTo(currentMap);
+                } else {
+                    // Colored segments
+                    let values;
+                    if (mapColorMode === 'elevation') {
+                        values = recs.map(r => r.enhancedAltitude != null ? r.enhancedAltitude : (r.altitude != null ? r.altitude : 0));
+                    } else {
+                        values = recs.map(r => ((r.enhancedSpeed != null ? r.enhancedSpeed : r.speed) || 0) * 3.6);
+                    }
+                    const min = Math.min(...values);
+                    const max = Math.max(...values);
+
+                    for (let i = 0; i < coords.length - 1; i++) {
+                        const color = interpolateColor(values[i], min, max);
+                        const seg = L.polyline([coords[i], coords[i+1]], { color, weight: 3, opacity: 0.9 }).addTo(currentMap);
+                        currentRouteLayers.push(seg);
+                    }
+                    // Create invisible polyline for bounds
+                    currentPolyline = L.polyline(coords, { opacity: 0 }).addTo(currentMap);
+                }
+
+                currentMap.fitBounds(currentPolyline.getBounds(), { padding: [20, 20] });
+
+                // Start / End markers
+                const startIcon = L.circleMarker(coords[0], { radius: 8, fillColor: getColormapHex(0.0), color: '#fff', weight: 2, fillOpacity: 1 });
+                const endIcon = L.circleMarker(coords[coords.length - 1], { radius: 8, fillColor: getColormapHex(1.0), color: '#fff', weight: 2, fillOpacity: 1 });
+                startIcon.bindTooltip('Start');
+                endIcon.bindTooltip('Finish');
+                startIcon.addTo(currentMap);
+                endIcon.addTo(currentMap);
+                currentRouteLayers.push(startIcon, endIcon);
+
+                // Lap markers
+                if (globalData.lapMesgs && globalData.lapMesgs.length > 1) {
+                    globalData.lapMesgs.forEach((lap, i) => {
+                        if (i === 0) return;
+                        if (lap.startPositionLat != null && lap.startPositionLong != null) {
+                            const latLng = [lap.startPositionLat / Math.pow(2,31) * 180, lap.startPositionLong / Math.pow(2,31) * 180];
+                            const m = L.circleMarker(latLng, { radius: 6, fillColor: getColormapHex(0.5), color: '#fff', weight: 2, fillOpacity: 0.9 });
+                            m.bindTooltip(`Lap ${i + 1}`);
+                            m.addTo(currentMap);
+                            currentRouteLayers.push(m);
+                        }
+                    });
+                }
+            }
+
+            function exportGPX() {
+                if (!globalData || !globalData.recordMesgs) return;
+                const recs = globalData.recordMesgs.filter(r => r.positionLat != null && r.positionLong != null);
+                if (recs.length === 0) return;
+
+                let gpx = '<?xml version="1.0" encoding="UTF-8"?>\n';
+                gpx += '<gpx version="1.1" creator="FIT Viewer">\n<trk><name>FIT Activity</name><trkseg>\n';
+                recs.forEach(r => {
+                    const lat = r.positionLat / Math.pow(2,31) * 180;
+                    const lon = r.positionLong / Math.pow(2,31) * 180;
+                    const ele = r.enhancedAltitude != null ? r.enhancedAltitude : (r.altitude != null ? r.altitude : 0);
+                    const time = new Date(r.timestamp).toISOString();
+                    gpx += `<trkpt lat="${lat}" lon="${lon}"><ele>${ele}</ele><time>${time}</time></trkpt>\n`;
+                });
+                gpx += '</trkseg></trk></gpx>';
+
+                const blob = new Blob([gpx], { type: 'application/gpx+xml' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url; a.download = 'activity.gpx';
+                document.body.appendChild(a); a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+
+            // ==============================
+            // ANALYTICS TAB
+            // ==============================
+
+            function renderAnalytics() {
+                if (!globalData || !globalData.recordMesgs) return;
+                safeCall(updateMetricExplorer, 'updateMetricExplorer');
+                safeCall(renderLapAnalysis, 'renderLapAnalysis');
+                safeCall(renderHRZoneAnalysis, 'renderHRZoneAnalysis');
+                safeCall(renderPowerZoneAnalysis, 'renderPowerZoneAnalysis');
+                safeCall(renderSplitAnalysis, 'renderSplitAnalysis');
+                safeCall(renderHalfComparison, 'renderHalfComparison');
+            }
+
+            function updateMetricExplorer() {
+                if (!globalData || !globalData.recordMesgs) return;
+                const metric = document.getElementById('analysis-metric').value;
+                const timeRange = document.getElementById('time-range').value;
+                const smoothing = parseInt(document.getElementById('smoothing').value);
+
+                const total = globalData.recordMesgs.length;
+                const count = Math.max(1, Math.floor(total * timeRange / 100));
+                let records = globalData.recordMesgs.slice(0, count);
+
+                if (smoothing > 0) records = applySmoothingFilter(records, smoothing, metric);
+
+                const stats = calculateMetricStats(records, metric);
+                renderPerformanceStats(stats, metric);
+                renderPerformanceChart(records, metric);
+            }
+
+            function applySmoothingFilter(records, seconds, metric) {
+                const windowSize = Math.max(1, seconds);
+                const smoothed = [];
+                for (let i = 0; i < records.length; i++) {
+                    const start = Math.max(0, i - Math.floor(windowSize / 2));
+                    const end = Math.min(records.length, i + Math.floor(windowSize / 2) + 1);
+                    const win = records.slice(start, end);
+                    const vals = win.map(r => getMetricValue(r, metric)).filter(v => v != null);
+                    if (vals.length > 0) {
+                        const avg = vals.reduce((a, b) => a + b, 0) / vals.length;
+                        smoothed.push({...records[i], _smoothed: avg});
+                    } else {
+                        smoothed.push({...records[i], _smoothed: null});
+                    }
+                }
+                return smoothed;
+            }
+
+            function calculateMetricStats(records, metric) {
+                const values = validNumbers(records.map(r => r._smoothed != null ? r._smoothed : getMetricValue(r, metric)));
+                if (values.length === 0) return {};
+                const sorted = [...values].sort((a, b) => a - b);
+                return {
+                    count: values.length,
+                    min: Math.min(...values),
+                    max: Math.max(...values),
+                    avg: values.reduce((a, b) => a + b, 0) / values.length,
+                    median: sorted[Math.floor(sorted.length / 2)],
+                    p95: sorted[Math.floor(sorted.length * 0.95)],
+                    p5: sorted[Math.floor(sorted.length * 0.05)]
+                };
+            }
+
+            function renderPerformanceStats(stats, metric) {
+                const el = document.getElementById('performance-stats');
+                const u = getMetricUnit(metric);
+                let html = '';
+                if (stats.avg != null) html += createStatCard(stats.avg.toFixed(1), 'Average', u);
+                if (stats.max != null) html += createStatCard(stats.max.toFixed(1), 'Maximum', u);
+                if (stats.min != null) html += createStatCard(stats.min.toFixed(1), 'Minimum', u);
+                if (stats.median != null) html += createStatCard(stats.median.toFixed(1), 'Median', u);
+                if (stats.p5 != null) html += createStatCard(stats.p5.toFixed(1), '5th Pctl', u);
+                if (stats.p95 != null) html += createStatCard(stats.p95.toFixed(1), '95th Pctl', u);
+                el.innerHTML = html;
+            }
+
+            function renderPerformanceChart(records, metric) {
+                const ctx = document.getElementById('performance-chart').getContext('2d');
+                if (performanceChart) performanceChart.destroy();
+                const c = getThemeColors();
+
+                const sampled = downsample(records);
+                const vals = sampled.map(r => r._smoothed != null ? r._smoothed : getMetricValue(r, metric));
+
+                performanceChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: sampled.map((r, i) => {
+                            if (r.distance != null) return (r.distance / 1000).toFixed(1);
+                            return i;
+                        }),
+                        datasets: [{
+                            label: `${metric} (${getMetricUnit(metric)})`,
+                            data: vals,
+                            borderColor: c.accent,
+                            backgroundColor: c.accent + '20',
+                            fill: true, tension: 0.1, pointRadius: 0, borderWidth: 1.5
+                        }]
+                    },
+                    options: chartBaseOptions({
+                        legend: { display: false },
+                        x: { title: { display: true, text: 'Distance (km) / Time', color: c.text } },
+                        y: { title: { display: true, text: `${metric} (${getMetricUnit(metric)})`, color: c.text } }
+                    })
+                });
+            }
+
+            // ---- Lap Analysis ----
+
+            function renderLapAnalysis() {
+                const section = document.getElementById('lap-analysis-section');
+                if (!globalData || !globalData.lapMesgs || globalData.lapMesgs.length === 0) {
+                    section.style.display = 'none'; return;
+                }
+                section.style.display = 'block';
+                const laps = globalData.lapMesgs;
+
+                let html = '<table class="analytics-table"><thead><tr>';
+                html += '<th>Lap</th><th>Duration</th><th>Distance</th><th>Avg Speed</th><th>Avg Pace</th><th>Avg HR</th><th>Max HR</th><th>Avg Power</th><th>Elev Gain</th>';
+                html += '</tr></thead><tbody>';
+
+                laps.forEach((lap, i) => {
+                    const dur = lap.totalTimerTime || lap.totalElapsedTime || 0;
+                    const dist = (lap.totalDistance || 0) / 1000;
+                    const speed = ((lap.enhancedAvgSpeed != null ? lap.enhancedAvgSpeed : lap.avgSpeed) || 0) * 3.6;
+                    html += `<tr>
+                        <td>Lap ${i + 1}</td>
+                        <td>${formatDuration(dur)}</td>
+                        <td>${dist.toFixed(2)} km</td>
+                        <td>${speed.toFixed(1)} km/h</td>
+                        <td>${formatPace(speed)} /km</td>
+                        <td>${lap.avgHeartRate || '-'}</td>
+                        <td>${lap.maxHeartRate || '-'}</td>
+                        <td>${lap.avgPower || '-'}</td>
+                        <td>${lap.totalAscent != null ? lap.totalAscent + ' m' : '-'}</td>
+                    </tr>`;
+                });
+                html += '</tbody></table>';
+                document.getElementById('lap-table-container').innerHTML = html;
+
+                // Lap chart
+                const ctx = document.getElementById('lap-chart').getContext('2d');
+                if (lapChart) lapChart.destroy();
+                const c = getThemeColors();
+
+                lapChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: laps.map((_, i) => `Lap ${i + 1}`),
+                        datasets: [{
+                            label: 'Avg Speed (km/h)',
+                            data: laps.map(l => (((l.enhancedAvgSpeed != null ? l.enhancedAvgSpeed : l.avgSpeed) || 0) * 3.6)),
+                            backgroundColor: laps.map((l, idx) => getColormapHex(idx / Math.max(1, laps.length - 1))),
+                            borderRadius: 4
+                        }]
+                    },
+                    options: chartBaseOptions({
+                        legend: { display: false },
+                        x: { title: { display: true, text: 'Lap', color: c.text } },
+                        y: { title: { display: true, text: 'Avg Speed (km/h)', color: c.text } }
+                    })
+                });
+            }
+
+            // ---- HR Zone Analysis ----
+
+            function renderHRZoneAnalysis() {
+                const section = document.getElementById('hr-zones-section');
+                if (!globalData || !globalData.recordMesgs) { section.style.display = 'none'; return; }
+                const heartRates = validNumbers(globalData.recordMesgs.map(r => r.heartRate));
+                if (heartRates.length === 0) { section.style.display = 'none'; return; }
+                section.style.display = 'block';
+
+                const zones = getHRZones(heartRates);
+                const zoneData = zones.map(z => {
+                    const count = heartRates.filter(hr => hr >= z.min && hr < z.max).length;
+                    return { ...z, count, pct: (count / heartRates.length * 100).toFixed(1) };
+                });
+
+                // Stats
+                const statsEl = document.getElementById('hr-zone-stats');
+                statsEl.innerHTML = zoneData.map(z =>
+                    `<div class="stat-card" style="border-left: 4px solid ${z.color};">
+                        <div class="stat-value">${formatDuration(z.count)}</div>
+                        <div class="stat-label">${z.zone}</div>
+                        <div class="stat-unit">${z.pct}%</div>
+                    </div>`
+                ).join('');
+
+                // Bar chart
+                const ctx1 = document.getElementById('hr-zone-bar-chart').getContext('2d');
+                if (hrZoneBarChart) hrZoneBarChart.destroy();
+                hrZoneBarChart = new Chart(ctx1, {
+                    type: 'bar',
+                    data: {
+                        labels: zoneData.map(z => z.zone),
+                        datasets: [{
+                            label: 'Time (s)',
+                            data: zoneData.map(z => z.count),
+                            backgroundColor: zoneData.map(z => z.color),
+                            borderRadius: 4
+                        }]
+                    },
+                    options: { ...chartBaseOptions({ legend: { display: false } }), indexAxis: 'y' }
+                });
+
+                // Donut chart
+                const ctx2 = document.getElementById('hr-zone-donut-chart').getContext('2d');
+                if (hrZoneDonutChart) hrZoneDonutChart.destroy();
+                hrZoneDonutChart = new Chart(ctx2, {
+                    type: 'doughnut',
+                    data: {
+                        labels: zoneData.map(z => z.zone),
+                        datasets: [{ data: zoneData.map(z => z.count), backgroundColor: zoneData.map(z => z.color), borderWidth: 1, borderColor: getThemeColors().bg }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'right', labels: { color: getThemeColors().text } },
+                            tooltip: { callbacks: { label: (ctx) => `${ctx.label}: ${formatDuration(ctx.raw)} (${((ctx.raw/heartRates.length)*100).toFixed(1)}%)` } }
+                        }
+                    }
+                });
+            }
+
+            // ---- Power Zone Analysis ----
+
+            function renderPowerZoneAnalysis() {
+                const section = document.getElementById('power-zones-section');
+                if (!globalData || !globalData.recordMesgs) { section.style.display = 'none'; return; }
+                const powers = validNumbers(globalData.recordMesgs.map(r => r.power));
+                if (powers.length < 10) { section.style.display = 'none'; return; }
+                section.style.display = 'block';
+
+                // Estimate FTP as 95% of best 20-min average (or use max * 0.75 as rough estimate)
+                const sorted = [...powers].sort((a, b) => b - a);
+                const sampleSize = Math.max(1, Math.min(1200, Math.floor(sorted.length * 0.1)));
+                const estFTP = Math.round(sorted.slice(0, sampleSize).reduce((a,b) => a+b, 0) / sampleSize * 0.95);
+
+                const zones = getPowerZones(estFTP);
+
+                const zoneData = zones.map(z => {
+                    const count = powers.filter(p => p >= z.min && p < z.max).length;
+                    return { ...z, count, pct: (count / powers.length * 100).toFixed(1) };
+                });
+
+                const statsEl = document.getElementById('power-zone-stats');
+                statsEl.innerHTML = `<div class="stat-card"><div class="stat-value">${estFTP}</div><div class="stat-label">Est. FTP</div><div class="stat-unit">W</div></div>` +
+                    zoneData.map(z =>
+                        `<div class="stat-card" style="border-left: 4px solid ${z.color};">
+                            <div class="stat-value">${formatDuration(z.count)}</div>
+                            <div class="stat-label">${z.zone}</div>
+                            <div class="stat-unit">${z.pct}%</div>
+                        </div>`
+                    ).join('');
+
+                const ctx = document.getElementById('power-zone-chart').getContext('2d');
+                if (powerZoneChart) powerZoneChart.destroy();
+                powerZoneChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: zoneData.map(z => z.zone),
+                        datasets: [{ label: 'Time (s)', data: zoneData.map(z => z.count), backgroundColor: zoneData.map(z => z.color), borderRadius: 4 }]
+                    },
+                    options: { ...chartBaseOptions({ legend: { display: false } }), indexAxis: 'y' }
+                });
+            }
+
+            // ---- Split Analysis ----
+
+            function renderSplitAnalysis() {
+                const section = document.getElementById('split-analysis-section');
+                if (!globalData || !globalData.recordMesgs) { section.style.display = 'none'; return; }
+                const records = globalData.recordMesgs.filter(r => r.distance != null && isFinite(r.distance));
+                if (records.length === 0) { section.style.display = 'none'; return; }
+                section.style.display = 'block';
+
+                // Group by km
+                const splits = [];
+                let currentKm = 0;
+                let splitStart = 0;
+
+                for (let i = 0; i < records.length; i++) {
+                    const km = Math.floor(records[i].distance / 1000);
+                    if (km > currentKm || i === records.length - 1) {
+                        if (i > splitStart) {
+                            const chunk = records.slice(splitStart, i);
+                            const startTime = new Date(chunk[0].timestamp);
+                            const endTime = new Date(chunk[chunk.length - 1].timestamp);
+                            const dur = (endTime - startTime) / 1000;
+                            const dist = (chunk[chunk.length - 1].distance - chunk[0].distance) / 1000;
+                            const speeds = validNumbers(chunk.map(r => {
+                                const v = r.enhancedSpeed != null ? r.enhancedSpeed : r.speed;
+                                return v != null ? v * 3.6 : NaN;
+                            }));
+                            const hrs = validNumbers(chunk.map(r => r.heartRate));
+                            const elevs = validNumbers(chunk.map(r => r.enhancedAltitude != null ? r.enhancedAltitude : r.altitude));
+                            const avgSpeed = speeds.length > 0 ? speeds.reduce((a, b) => a + b, 0) / speeds.length : 0;
+                            const avgHR = hrs.length > 0 ? Math.round(hrs.reduce((a, b) => a + b, 0) / hrs.length) : null;
+                            const elevGain = elevs.length > 1 ? calculateElevationGain(elevs) : 0;
+
+                            splits.push({ km: currentKm + 1, duration: dur, distance: dist, avgSpeed, avgHR, elevGain });
+                        }
+                        splitStart = i;
+                        currentKm = km;
+                    }
+                }
+
+                let html = '<table class="analytics-table"><thead><tr>';
+                html += '<th>Split</th><th>Duration</th><th>Avg Speed</th><th>Pace</th><th>Avg HR</th><th>Elev Gain</th>';
+                html += '</tr></thead><tbody>';
+                splits.forEach(s => {
+                    html += `<tr>
+                        <td>km ${s.km}</td>
+                        <td>${formatDuration(s.duration)}</td>
+                        <td>${s.avgSpeed.toFixed(1)} km/h</td>
+                        <td>${formatPace(s.avgSpeed)} /km</td>
+                        <td>${s.avgHR || '-'}</td>
+                        <td>${s.elevGain} m</td>
+                    </tr>`;
+                });
+                html += '</tbody></table>';
+                document.getElementById('split-table-container').innerHTML = html;
+
+                // Split pace chart
+                const ctx = document.getElementById('split-chart').getContext('2d');
+                if (splitChart) splitChart.destroy();
+                const c = getThemeColors();
+
+                const avgOverall = splits.reduce((s, x) => s + x.avgSpeed, 0) / splits.length;
+
+                splitChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: splits.map(s => `km ${s.km}`),
+                        datasets: [{
+                            label: 'Avg Speed (km/h)',
+                            data: splits.map(s => s.avgSpeed),
+                            backgroundColor: splits.map(s => {
+                                const t = avgOverall > 0 ? Math.min(1, s.avgSpeed / (avgOverall * 1.5)) : 0.5;
+                                return getColormapHex(t);
+                            }),
+                            borderRadius: 4
+                        }]
+                    },
+                    options: chartBaseOptions({
+                        legend: { display: false },
+                        x: { title: { display: true, text: 'Split', color: c.text } },
+                        y: { title: { display: true, text: 'Speed (km/h)', color: c.text } }
+                    })
+                });
+            }
+
+            // ---- First Half vs Second Half ----
+
+            function renderHalfComparison() {
+                const section = document.getElementById('half-comparison-section');
+                if (!globalData || !globalData.recordMesgs || globalData.recordMesgs.length < 20) {
+                    section.style.display = 'none'; return;
+                }
+                section.style.display = 'block';
+
+                const recs = globalData.recordMesgs;
+                const mid = Math.floor(recs.length / 2);
+                const first = recs.slice(0, mid);
+                const second = recs.slice(mid);
+
+                function halfStats(chunk) {
+                    const speeds = validNumbers(chunk.map(r => {
+                        const v = r.enhancedSpeed != null ? r.enhancedSpeed : r.speed;
+                        return v != null ? v * 3.6 : NaN;
+                    }));
+                    const hrs = validNumbers(chunk.map(r => r.heartRate));
+                    const powers = validNumbers(chunk.map(r => r.power));
+                    const cadences = validNumbers(chunk.map(r => r.cadence));
+                    return {
+                        avgSpeed: speeds.length ? (speeds.reduce((a,b) => a+b,0) / speeds.length) : null,
+                        avgHR: hrs.length ? Math.round(hrs.reduce((a,b) => a+b,0) / hrs.length) : null,
+                        avgPower: powers.length ? Math.round(powers.reduce((a,b) => a+b,0) / powers.length) : null,
+                        avgCadence: cadences.length ? Math.round(cadences.reduce((a,b) => a+b,0) / cadences.length) : null
+                    };
+                }
+
+                const s1 = halfStats(first);
+                const s2 = halfStats(second);
+
+                function deltaHtml(v1, v2, unit, higherIsBetter) {
+                    if (v1 == null || v2 == null) return '-';
+                    const diff = v2 - v1;
+                    const sign = diff >= 0 ? '+' : '';
+                    const cls = (higherIsBetter ? diff >= 0 : diff <= 0) ? 'delta-positive' : 'delta-negative';
+                    return `<span class="${cls}">${sign}${diff.toFixed(1)} ${unit}</span>`;
+                }
+
+                const metrics = [
+                    { label: 'Avg Speed', v1: s1.avgSpeed, v2: s2.avgSpeed, unit: 'km/h', hib: true },
+                    { label: 'Avg HR', v1: s1.avgHR, v2: s2.avgHR, unit: 'bpm', hib: false },
+                    { label: 'Avg Power', v1: s1.avgPower, v2: s2.avgPower, unit: 'W', hib: true },
+                    { label: 'Avg Cadence', v1: s1.avgCadence, v2: s2.avgCadence, unit: 'rpm', hib: true }
+                ].filter(m => m.v1 != null && m.v2 != null);
+
+                let html = '<div class="comparison-grid">';
+                html += '<div class="comparison-card"><h4>First Half</h4>';
+                metrics.forEach(m => { html += `<div style="margin-bottom:8px;"><strong>${m.label}:</strong> ${m.v1.toFixed(1)} ${m.unit}</div>`; });
+                html += '</div>';
+                html += '<div class="comparison-card"><h4>Second Half</h4>';
+                metrics.forEach(m => {
+                    html += `<div style="margin-bottom:8px;"><strong>${m.label}:</strong> ${m.v2.toFixed(1)} ${m.unit} ${deltaHtml(m.v1, m.v2, m.unit, m.hib)}</div>`;
+                });
+                html += '</div></div>';
+
+                document.getElementById('half-comparison-stats').innerHTML = html;
+            }
+
+            // ==============================
+            // DATA TAB (unchanged)
+            // ==============================
 
             function displayTables(dataFrames) {
                 const aq = window.aq;
                 const container = document.getElementById("content-data");
-                container.innerHTML = ""; // Clear previous content
-
-                // Ensure recordMesgs appears first
+                container.innerHTML = "";
                 const keys = Object.keys(dataFrames);
                 keys.sort((a, b) => (a === "recordMesgs" ? -1 : b === "recordMesgs" ? 1 : 0));
                 keys.forEach((key, index) => {
@@ -233,7 +1325,6 @@
                 const section = document.createElement("div");
                 section.classList.add("table-section");
 
-                // Header with left: title; right: copy button and toggle icon
                 const header = document.createElement("div");
                 header.classList.add("table-header");
 
@@ -248,13 +1339,10 @@
                 const copyButton = document.createElement("button");
                 copyButton.textContent = "Copy as CSV";
                 copyButton.classList.add("copy-btn");
-                copyButton.onclick = (event) => {
-                    event.stopPropagation();
-                    copyTableAsCSV(table, title);
-                };
+                copyButton.onclick = (event) => { event.stopPropagation(); copyTableAsCSV(table, title); };
 
                 const icon = document.createElement("span");
-                icon.textContent = "➕";
+                icon.textContent = "+";
 
                 rightContainer.appendChild(copyButton);
                 rightContainer.appendChild(icon);
@@ -263,17 +1351,15 @@
 
                 header.onclick = () => {
                     const content = document.getElementById(tableId + "_content");
-                    const currentDisplay = window.getComputedStyle(content).display;
-                    const isVisible = currentDisplay === "block";
+                    const isVisible = window.getComputedStyle(content).display === "block";
                     content.style.display = isVisible ? "none" : "block";
-                    icon.textContent = isVisible ? "➕" : "➖";
+                    icon.textContent = isVisible ? "+" : "-";
                 };
 
                 const content = document.createElement("div");
                 content.classList.add("table-content");
                 content.id = tableId + "_content";
                 content.style.display = "none";
-                icon.textContent = "➕";
 
                 const tableElement = document.createElement("table");
                 tableElement.id = tableId;
@@ -285,15 +1371,16 @@
                 section.appendChild(content);
                 container.appendChild(section);
 
-                // Initialize DataTables.js with paging disabled (show all rows)
                 $(document).ready(function () {
                     setTimeout(() => {
-                        $("#" + tableId).DataTable({
-                            paging: false,
-                            searching: true,
-                            ordering: true,
-                            autoWidth: true,
-                        });
+                        try {
+                            $("#" + tableId).DataTable({
+                                paging: true, pageLength: 25, searching: true,
+                                ordering: true, autoWidth: true,
+                                dom: 'Bfrtip', buttons: ['copy', 'csv'],
+                                scrollX: true
+                            });
+                        } catch(e) { console.warn('DataTable init failed for', tableId, e); }
                     }, 100);
                 });
             }
@@ -307,417 +1394,224 @@
                     });
                     return newRow;
                 });
-                const flattenedTable = window.aq.from(rows);
-                const csvString = flattenedTable.toCSV({ header: true });
+                const csvString = window.aq.from(rows).toCSV({ header: true });
                 navigator.clipboard.writeText(csvString)
                     .then(() => console.log("Copied CSV to clipboard!"))
                     .catch(err => console.error("Failed to copy CSV:", err));
             }
 
-            function renderChart() {
-                const chartContainer = document.getElementById("content-chart");
-                chartContainer.innerHTML = '<div id="vega-container"></div>';
+            // ==============================
+            // CHARTS TAB
+            // ==============================
 
-                if (globalData && globalData.recordMesgs) {
-                    const aq = window.aq;
-                    const recordTable = aq.from(globalData.recordMesgs);
-                    const columnsToFold = recordTable.columnNames().filter(col => col !== "timestamp");
-                    const folded = recordTable.fold(columnsToFold, { as: ["key", "value"] });
-
-                    const spec = {
-                        "config": {
-                            "text": {
-                                "color": "gray",
-                                "fontSize": 14
-                            },
-                            "title": {
-                                "anchor": "middle",
-                                "fontWeight": "normal",
-                                "titleFontWeight": "normal",
-                                "labelFontWeight": "normal",
-                                "fontSize": 30,
-                                "titleFontSize": 16,
-                                "labelFontSize": 14,
-                                "color": "gray",
-                                "titleColor": "gray",
-                                "labelColor": "gray",
-                                "tickColor": "gray",
-                                "domainColor": "gray"
-                            },
-                            "header": {
-                                "titleFontSize": 22,
-                                "labelFontSize": 18,
-                                "color": "gray",
-                                "titleColor": "gray",
-                                "labelColor": "gray",
-                                "fontWeight": "normal",
-                                "titleFontWeight": "normal",
-                                "labelFontWeight": "normal"
-                            },
-                            "view": {
-                                "height": 800,
-                                "width": 800,
-                                "strokeWidth": 0,
-                                "fill": "white"
-                            },
-                            "axis": {
-                                "domain": true,
-                                "domainColor": "gray",
-                                "domainWidth": 1,
-                                "gridWidth": 1,
-                                "labelAngle": 0,
-                                "tickSize": 5,
-                                "gridCap": "round",
-                                "gridDash": [
-                                    2,
-                                    4
-                                ],
-                                "fontWeight": "normal",
-                                "titleFontWeight": "normal",
-                                "labelFontWeight": "normal",
-                                "fontSize": 30,
-                                "titleFontSize": 16,
-                                "labelFontSize": 14,
-                                "color": "gray",
-                                "titleColor": "gray",
-                                "labelColor": "gray",
-                                "tickColor": "gray"
-                            },
-                            "axisX": {
-                                "titleAnchor": "end",
-                                "titleAlign": "center"
-                            },
-                            "axisY": {
-                                "titleAnchor": "end",
-                                "titleAngle": 0,
-                                "titleAlign": "center",
-                                "titleY": -15,
-                                "titleX": 0
-                            },
-                            "legend": {
-                                "fontWeight": "normal",
-                                "titleFontWeight": "normal",
-                                "labelFontWeight": "normal",
-                                "fontSize": 30,
-                                "titleFontSize": 16,
-                                "labelFontSize": 14,
-                                "color": "gray",
-                                "titleColor": "gray",
-                                "labelColor": "gray",
-                                "tickColor": "gray",
-                                "domainColor": "gray"
-                            }
-                        },
-                        "data": { "values": folded.objects() },
-                        "facet": {
-                            "row": {
-                                "field": "key",
-                                "header": {
-                                    "labelOrient": "right",
-                                    "labelAngle": 0
-                                },
-                                "type": "nominal"
-                            }
-                        },
-                        "spec": {
-                            "layer": [
-                                {
-                                    "mark": {
-                                        "type": "line",
-                                        "color": "#1f77b4"
-                                    },
-                                    "encoding": {
-                                        "opacity": {
-                                            "value": 0.2
-                                        },
-                                        "x": {
-                                            "field": "timestamp",
-                                            "title": "Elapsed time (seconds)",
-                                            "type": "temporal"
-                                        },
-                                        "y": {
-                                            "field": "value",
-                                            "scale": {
-                                                "zero": false
-                                            },
-                                            "title": "",
-                                            "type": "quantitative"
-                                        }
-                                    },
-                                    "name": "view_11"
-                                },
-                                {
-                                    "mark": {
-                                        "type": "line",
-                                        "color": "#1f77b4"
-                                    },
-                                    "encoding": {
-                                        "opacity": {
-                                            "value": 1
-                                        },
-                                        "x": {
-                                            "field": "timestamp",
-                                            "type": "temporal"
-                                        },
-                                        "y": {
-                                            "field": "value",
-                                            "scale": {
-                                                "zero": false
-                                            },
-                                            "type": "quantitative"
-                                        }
-                                    },
-                                    "transform": [
-                                        {
-                                            "filter": {
-                                                "param": "param_11"
-                                            }
-                                        }
-                                    ]
-                                },
-                                {
-                                    "mark": {
-                                        "type": "rule",
-                                        "color": "firebrick",
-                                        "strokeDash": [
-                                            5,
-                                            5
-                                        ]
-                                    },
-                                    "encoding": {
-                                        "x": {
-                                            "aggregate": "min",
-                                            "field": "timestamp",
-                                            "type": "temporal"
-                                        },
-                                        "x2": {
-                                            "aggregate": "max",
-                                            "field": "timestamp"
-                                        },
-                                        "y": {
-                                            "aggregate": "min",
-                                            "field": "value",
-                                            "scale": {
-                                                "zero": false
-                                            },
-                                            "type": "quantitative"
-                                        }
-                                    },
-                                    "transform": [
-                                        {
-                                            "filter": {
-                                                "param": "param_11"
-                                            }
-                                        }
-                                    ]
-                                },
-                                {
-                                    "mark": {
-                                        "type": "text",
-                                        "color": "#1f77b4",
-                                        "dx": 0,
-                                        "dy": -50,
-                                        "size": 20
-                                    },
-                                    "encoding": {
-                                        "text": {
-                                            "aggregate": "mean",
-                                            "field": "value",
-                                            "format": ".3f",
-                                            "type": "quantitative"
-                                        },
-                                        "x": {
-                                            "aggregate": "mean",
-                                            "field": "timestamp",
-                                            "type": "temporal"
-                                        },
-                                        "y": {
-                                            "aggregate": "min",
-                                            "field": "value",
-                                            "scale": {
-                                                "zero": false
-                                            },
-                                            "type": "quantitative"
-                                        }
-                                    },
-                                    "transform": [
-                                        {
-                                            "filter": {
-                                                "param": "param_11"
-                                            }
-                                        }
-                                    ]
-                                },
-                                {
-                                    "mark": {
-                                        "type": "text",
-                                        "color": "firebrick",
-                                        "dx": 0,
-                                        "dy": -10,
-                                        "size": 14
-                                    },
-                                    "encoding": {
-                                        "text": {
-                                            "aggregate": "count",
-                                            "field": "value",
-                                            "format": ".3f",
-                                            "type": "quantitative"
-                                        },
-                                        "x": {
-                                            "aggregate": "mean",
-                                            "field": "timestamp",
-                                            "type": "temporal"
-                                        },
-                                        "y": {
-                                            "aggregate": "min",
-                                            "field": "value",
-                                            "scale": {
-                                                "zero": false
-                                            },
-                                            "type": "quantitative"
-                                        }
-                                    },
-                                    "transform": [
-                                        {
-                                            "filter": {
-                                                "param": "param_11"
-                                            }
-                                        }
-                                    ]
-                                },
-                                {
-                                    "mark": {
-                                        "type": "text",
-                                        "color": "firebrick",
-                                        "dx": -20,
-                                        "dy": -10,
-                                        "size": 14
-                                    },
-                                    "encoding": {
-                                        "text": {
-                                            "aggregate": "min",
-                                            "field": "timestamp",
-                                            "formatType": "time",
-                                            "timeUnit": "hoursminutesseconds",
-                                            "type": "temporal"
-                                        },
-                                        "x": {
-                                            "aggregate": "min",
-                                            "field": "timestamp",
-                                            "type": "temporal"
-                                        },
-                                        "y": {
-                                            "aggregate": "min",
-                                            "field": "value",
-                                            "scale": {
-                                                "zero": false
-                                            },
-                                            "type": "quantitative"
-                                        }
-                                    },
-                                    "transform": [
-                                        {
-                                            "filter": {
-                                                "param": "param_11"
-                                            }
-                                        }
-                                    ]
-                                },
-                                {
-                                    "mark": {
-                                        "type": "text",
-                                        "color": "firebrick",
-                                        "dx": 20,
-                                        "dy": -10,
-                                        "size": 14
-                                    },
-                                    "encoding": {
-                                        "text": {
-                                            "aggregate": "max",
-                                            "field": "timestamp",
-                                            "formatType": "time",
-                                            "timeUnit": "hoursminutesseconds",
-                                            "type": "temporal"
-                                        },
-                                        "x": {
-                                            "aggregate": "max",
-                                            "field": "timestamp",
-                                            "type": "temporal"
-                                        },
-                                        "y": {
-                                            "aggregate": "min",
-                                            "field": "value",
-                                            "scale": {
-                                                "zero": false
-                                            },
-                                            "type": "quantitative"
-                                        }
-                                    },
-                                    "transform": [
-                                        {
-                                            "filter": {
-                                                "param": "param_11"
-                                            }
-                                        }
-                                    ]
-                                }
-                            ],
-                            "height": 200,
-                            "width": 800
-                        },
-                        "params": [
-                            {
-                                "name": "param_11",
-                                "select": {
-                                    "type": "interval",
-                                    "encodings": [
-                                        "x"
-                                    ]
-                                },
-                                "views": [
-                                    "view_11"
-                                ]
-                            }
-                        ],
-                        "resolve": {
-                            "scale": {
-                                "x": "independent",
-                                "y": "independent"
-                            }
-                        },
-                        "spacing": 25,
-                        "$schema": "https://vega.github.io/schema/vega-lite/v5.20.1.json"
-                    };
-
-                    vegaEmbed("#vega-container", spec).catch(console.error);
-                } else {
-                    chartContainer.innerHTML = "<p>No recordMesgs data available for chart.</p>";
+            function renderAdvancedChart(chartType) {
+                const container = document.getElementById("chart-container");
+                if (typeof vegaEmbed === 'undefined') {
+                    container.innerHTML = '<p>Vega library not loaded. Charts require an internet connection.</p>';
+                    return;
+                }
+                try {
+                    switch(chartType) {
+                        case 'time-series': renderTimeSeriesChart(container); break;
+                        case 'correlation': renderCorrelationChart(container); break;
+                        case 'distribution': renderDistributionChart(container); break;
+                        case 'zones': renderZonesChart(container); break;
+                        default: renderTimeSeriesChart(container);
+                    }
+                } catch(e) {
+                    console.warn('[FIT Viewer] renderAdvancedChart error:', e);
+                    container.innerHTML = '<p>Failed to render chart. This FIT file may not have the required data.</p>';
                 }
             }
 
-            function renderMap() {
-                const mapContainer = document.getElementById("content-map");
-                mapContainer.innerHTML = '<div id="leaflet-map" style="height: 800px;"></div>';
-
-                const map = L.map('leaflet-map').setView([0, 0], 2);
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                }).addTo(map);
-
-                if (globalData && globalData.recordMesgs) {
-                    const coords = globalData.recordMesgs
-                        .filter(row => row.positionLat != null && row.positionLong != null)
-                        .map(row => [Number(row.positionLat / 2 ** 31 * 180), Number(row.positionLong / 2 ** 31 * 180)]);
-
-                    if (coords.length > 0) {
-                        const polyline = L.polyline(coords, { color: 'blue' }).addTo(map);
-                        map.fitBounds(polyline.getBounds());
-                    } else {
-                        mapContainer.innerHTML = '<p>No location data available to display map.</p>';
-                    }
-                } else {
-                    mapContainer.innerHTML = '<p>No location data available to display map.</p>';
+            function renderTimeSeriesChart(container) {
+                container.innerHTML = '<div id="vega-container-advanced" style="width:100%;"></div>';
+                if (!globalData || !globalData.recordMesgs || globalData.recordMesgs.length === 0) {
+                    container.innerHTML = "<p>No data available.</p>"; return;
                 }
+
+                const records = globalData.recordMesgs;
+                const columns = Object.keys(records[0] || {});
+
+                const metricDefs = [
+                    { field: 'heartRate', label: 'Heart Rate (bpm)' },
+                    { field: columns.includes('enhancedSpeed') ? 'enhancedSpeed' : 'speed', label: 'Speed (m/s)' },
+                    { field: columns.includes('enhancedAltitude') ? 'enhancedAltitude' : 'altitude', label: 'Altitude (m)' },
+                    { field: 'power', label: 'Power (W)' },
+                    { field: 'cadence', label: 'Cadence (rpm)' },
+                    { field: 'temperature', label: 'Temperature (C)' }
+                ].filter(m => columns.includes(m.field));
+
+                if (metricDefs.length === 0) { container.innerHTML = "<p>No numeric metrics found.</p>"; return; }
+
+                const data = downsample(records);
+                const c = getThemeColors();
+
+                const spec = {
+                    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+                    "config": {
+                        "view": { "stroke": "transparent" },
+                        "axis": { "labelColor": c.text, "titleColor": c.text, "gridColor": c.grid + '40', "domainColor": c.grid }
+                    },
+                    "data": { "values": data },
+                    "vconcat": metricDefs.map(m => ({
+                        "width": "container",
+                        "height": 150,
+                        "mark": { "type": "line", "strokeWidth": 1.5 },
+                        "encoding": {
+                            "x": { "field": "timestamp", "type": "temporal", "title": null },
+                            "y": { "field": m.field, "type": "quantitative", "title": m.label, "scale": { "zero": false } },
+                            "color": { "value": c.accent }
+                        }
+                    })),
+                    "resolve": { "scale": { "y": "independent" } }
+                };
+
+                vegaEmbed("#vega-container-advanced", spec, { actions: false }).catch(console.error);
+            }
+
+            function renderCorrelationChart(container) {
+                container.innerHTML = '<div id="correlation-chart" style="width:100%;"></div>';
+                if (!globalData || !globalData.recordMesgs) { container.innerHTML = "<p>No data available.</p>"; return; }
+
+                const records = globalData.recordMesgs;
+                const columns = Object.keys(records[0] || {});
+                const speedField = columns.includes('enhancedSpeed') ? 'enhancedSpeed' : (columns.includes('speed') ? 'speed' : null);
+                const numericFields = [speedField, 'heartRate', 'power', 'cadence'].filter(f => f && columns.includes(f));
+
+                if (numericFields.length < 2) { container.innerHTML = '<p>Need at least 2 numeric metrics for correlation.</p>'; return; }
+
+                const data = downsample(records, 500).map(r => {
+                    const obj = {};
+                    let allValid = true;
+                    numericFields.forEach(f => {
+                        let v = r[f];
+                        if (v == null || !isFinite(v)) { allValid = false; return; }
+                        if (f === speedField) v = v * 3.6;
+                        obj[f === speedField ? 'speed_kmh' : f] = v;
+                    });
+                    return allValid ? obj : null;
+                }).filter(Boolean);
+
+                const fields = numericFields.map(f => f === speedField ? 'speed_kmh' : f);
+                const c = getThemeColors();
+
+                const spec = {
+                    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+                    "config": { "axis": { "labelColor": c.text, "titleColor": c.text, "gridColor": c.grid + '40' } },
+                    "data": { "values": data },
+                    "repeat": { "row": fields, "column": fields },
+                    "spec": {
+                        "width": 180, "height": 180,
+                        "mark": { "type": "circle", "size": 8 },
+                        "encoding": {
+                            "x": { "field": { "repeat": "column" }, "type": "quantitative" },
+                            "y": { "field": { "repeat": "row" }, "type": "quantitative" },
+                            "color": { "value": c.accent },
+                            "opacity": { "value": 0.4 }
+                        }
+                    }
+                };
+
+                vegaEmbed("#correlation-chart", spec, { actions: false }).catch(console.error);
+            }
+
+            function renderDistributionChart(container) {
+                container.innerHTML = '<div id="distribution-chart" style="width:100%;"></div>';
+                if (!globalData || !globalData.recordMesgs) { container.innerHTML = "<p>No data available.</p>"; return; }
+
+                const records = globalData.recordMesgs;
+                const columns = Object.keys(records[0] || {});
+                const speedField = columns.includes('enhancedSpeed') ? 'enhancedSpeed' : 'speed';
+
+                const metricDefs = [
+                    { field: 'heartRate', label: 'Heart Rate (bpm)' },
+                    { field: speedField, label: 'Speed (m/s)' },
+                    { field: 'power', label: 'Power (W)' },
+                    { field: 'cadence', label: 'Cadence (rpm)' }
+                ].filter(m => columns.includes(m.field));
+
+                if (metricDefs.length === 0) { container.innerHTML = '<p>No numeric metrics found.</p>'; return; }
+
+                const values = [];
+                records.forEach(r => {
+                    metricDefs.forEach(m => {
+                        const v = r[m.field];
+                        if (v != null && isFinite(v)) values.push({ metric: m.label, value: v });
+                    });
+                });
+
+                const c = getThemeColors();
+                const spec = {
+                    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+                    "config": { "axis": { "labelColor": c.text, "titleColor": c.text, "gridColor": c.grid + '40' }, "header": { "labelColor": c.text, "titleColor": c.text } },
+                    "data": { "values": downsample(values, 20000) },
+                    "facet": { "row": { "field": "metric", "type": "nominal", "title": null } },
+                    "spec": {
+                        "width": "container", "height": 180,
+                        "mark": "bar",
+                        "encoding": {
+                            "x": { "field": "value", "bin": { "maxbins": 40 }, "type": "quantitative", "title": "Value" },
+                            "y": { "aggregate": "count", "type": "quantitative", "title": "Count" },
+                            "color": { "value": c.accent }
+                        }
+                    }
+                };
+
+                vegaEmbed("#distribution-chart", spec, { actions: false }).catch(console.error);
+            }
+
+            function renderZonesChart(container) {
+                container.innerHTML = '<div id="zones-chart" style="width:100%;"></div>';
+                if (!globalData || !globalData.recordMesgs) { container.innerHTML = "<p>No data available.</p>"; return; }
+
+                const records = globalData.recordMesgs;
+                const heartRates = validNumbers(records.map(r => r.heartRate));
+                const powers = validNumbers(records.map(r => r.power));
+
+                if (heartRates.length === 0 && powers.length === 0) {
+                    container.innerHTML = "<p>No heart rate or power data available.</p>"; return;
+                }
+
+                const allZoneData = [];
+
+                if (heartRates.length > 0) {
+                    const hrZones = getHRZones(heartRates);
+                    hrZones.forEach(z => {
+                        const count = heartRates.filter(hr => hr >= z.min && hr < z.max).length;
+                        allZoneData.push({ type: 'Heart Rate', zone: z.zone, seconds: count, color: z.color });
+                    });
+                }
+
+                if (powers.length >= 10) {
+                    const sorted = [...powers].sort((a, b) => b - a);
+                    const sampleSize = Math.max(1, Math.min(1200, Math.floor(sorted.length * 0.1)));
+                    const estFTP = Math.round(sorted.slice(0, sampleSize).reduce((a,b)=>a+b,0) / sampleSize * 0.95);
+                    const pzones = getPowerZones(estFTP);
+                    pzones.forEach(z => {
+                        const count = powers.filter(p => p >= z.min && p < z.max).length;
+                        allZoneData.push({ type: 'Power', zone: z.zone, seconds: count, color: z.color });
+                    });
+                }
+
+                const c = getThemeColors();
+                const spec = {
+                    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+                    "config": { "axis": { "labelColor": c.text, "titleColor": c.text, "gridColor": c.grid + '40' }, "header": { "labelColor": c.text } },
+                    "data": { "values": allZoneData },
+                    "facet": { "column": { "field": "type", "type": "nominal", "title": null } },
+                    "spec": {
+                        "width": 350, "height": 400,
+                        "mark": { "type": "bar", "cornerRadiusEnd": 4 },
+                        "encoding": {
+                            "y": { "field": "zone", "type": "nominal", "title": "Zone", "sort": null },
+                            "x": { "field": "seconds", "type": "quantitative", "title": "Time (seconds)" },
+                            "color": { "field": "color", "type": "nominal", "scale": null }
+                        }
+                    }
+                };
+
+                vegaEmbed("#zones-chart", spec, { actions: false }).catch(console.error);
             }
         };
     </script>
@@ -725,24 +1619,168 @@
 
 <body>
     <div id="tabs">
-        <button class="tab-button active" id="tab-map">Map</button>
+        <button class="tab-button active" id="tab-overview">Overview</button>
+        <button class="tab-button" id="tab-map">Map</button>
+        <button class="tab-button" id="tab-analytics">Analytics</button>
         <button class="tab-button" id="tab-data">Data</button>
-        <button class="tab-button" id="tab-chart">Chart</button>
+        <button class="tab-button" id="tab-chart">Charts</button>
     </div>
-    <div id="content-map" class="tab-content"></div>
+
+    <div class="colormap-selector" id="colormap-selector">
+        <label>Color Palette:</label>
+        <select id="colormap-select">
+            <option value="tableau10">Tableau 10 (default)</option>
+            <option value="bold">Bold</option>
+            <option value="ocean">Ocean</option>
+            <option value="sunset">Sunset</option>
+            <option value="viridis">Viridis</option>
+            <option value="inferno">Inferno</option>
+            <option value="magma">Magma</option>
+            <option value="plasma">Plasma</option>
+            <option value="cividis">Cividis</option>
+            <option value="turbo">Turbo</option>
+        </select>
+        <span class="colormap-preview" id="colormap-preview"></span>
+    </div>
+
+    <!-- OVERVIEW -->
+    <div id="content-overview" class="tab-content">
+        <div class="analytics-panel">
+            <h3>Activity Summary</h3>
+            <div class="analytics-grid" id="overview-stats"></div>
+        </div>
+        <div id="overview-charts" style="display: flex; flex-direction: column; gap: 20px;">
+            <div class="chart-wrapper">
+                <h4>Elevation Profile</h4>
+                <div style="height: 350px;"><canvas id="elevation-chart"></canvas></div>
+            </div>
+            <div class="chart-wrapper">
+                <h4>Speed & Heart Rate Over Distance</h4>
+                <div style="height: 350px;"><canvas id="speed-hr-chart"></canvas></div>
+            </div>
+            <div class="chart-wrapper" id="overview-zones-wrapper">
+                <h4>Heart Rate Zones</h4>
+                <div style="height: 300px;"><canvas id="overview-zones-chart"></canvas></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAP -->
+    <div id="content-map" class="tab-content" style="position: relative;">
+        <div class="map-controls">
+            <button id="btn-fit-route">Fit to Route</button>
+            <button id="btn-color-elevation">Color: Elevation</button>
+            <button id="btn-color-speed">Color: Speed</button>
+            <button id="btn-export-gpx">Export GPX</button>
+        </div>
+        <div id="leaflet-map" style="height: calc(100vh - 130px); min-height: 500px;"></div>
+    </div>
+
+    <!-- ANALYTICS -->
+    <div id="content-analytics" class="tab-content">
+        <div class="analytics-section">
+            <h3>Metric Explorer</h3>
+            <div class="filter-controls">
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label>Metric</label>
+                        <select id="analysis-metric">
+                            <option value="speed">Speed</option>
+                            <option value="heartRate">Heart Rate</option>
+                            <option value="power">Power</option>
+                            <option value="cadence">Cadence</option>
+                            <option value="altitude">Altitude</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Time Range</label>
+                        <input type="range" id="time-range" min="1" max="100" value="100">
+                    </div>
+                    <div class="filter-group">
+                        <label>Smoothing</label>
+                        <select id="smoothing">
+                            <option value="0">None</option>
+                            <option value="5">5 seconds</option>
+                            <option value="15">15 seconds</option>
+                            <option value="30">30 seconds</option>
+                            <option value="60">60 seconds</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="analytics-grid" id="performance-stats"></div>
+            <div class="chart-wrapper" style="height: 400px;">
+                <canvas id="performance-chart"></canvas>
+            </div>
+        </div>
+
+        <div class="analytics-section" id="lap-analysis-section" style="display:none;">
+            <h3>Lap Analysis</h3>
+            <div id="lap-table-container"></div>
+            <div class="chart-wrapper" style="height: 350px;">
+                <canvas id="lap-chart"></canvas>
+            </div>
+        </div>
+
+        <div class="analytics-section" id="hr-zones-section" style="display:none;">
+            <h3>Heart Rate Zone Analysis</h3>
+            <div class="analytics-grid" id="hr-zone-stats"></div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="chart-wrapper" style="height: 350px;">
+                    <canvas id="hr-zone-bar-chart"></canvas>
+                </div>
+                <div class="chart-wrapper" style="height: 350px;">
+                    <canvas id="hr-zone-donut-chart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="analytics-section" id="power-zones-section" style="display:none;">
+            <h3>Power Zone Analysis</h3>
+            <div class="analytics-grid" id="power-zone-stats"></div>
+            <div class="chart-wrapper" style="height: 350px;">
+                <canvas id="power-zone-chart"></canvas>
+            </div>
+        </div>
+
+        <div class="analytics-section" id="split-analysis-section" style="display:none;">
+            <h3>Split Analysis (per km)</h3>
+            <div id="split-table-container"></div>
+            <div class="chart-wrapper" style="height: 350px;">
+                <canvas id="split-chart"></canvas>
+            </div>
+        </div>
+
+        <div class="analytics-section" id="half-comparison-section" style="display:none;">
+            <h3>First Half vs Second Half</h3>
+            <div id="half-comparison-stats"></div>
+        </div>
+    </div>
+
+    <!-- DATA -->
     <div id="content-data" class="tab-content"></div>
+
+    <!-- CHARTS -->
     <div id="content-chart" class="tab-content">
+        <div class="chart-controls">
+            <h4>Chart Type</h4>
+            <button class="chart-type-btn active" data-type="time-series">Time Series</button>
+            <button class="chart-type-btn" data-type="correlation">Correlation</button>
+            <button class="chart-type-btn" data-type="distribution">Distribution</button>
+            <button class="chart-type-btn" data-type="zones">Zones</button>
+        </div>
         <div id="chart-container"></div>
     </div>
-    <!-- Credits Section -->
+
     <footer>
         <p>
             Credits:&nbsp;
             <a href="https://leafletjs.com/" target="_blank">Leaflet</a>,
             <a href="https://datatables.net/" target="_blank">DataTables.js</a>,
-            <a href="https://github.com/uwdata/arquero" target="_blank">arquero</a>,
-            <a href="https://github.com/garmin/fit-javascript-sdk" target="_blank">Garmin FIT JavaScript SDK</a>,
+            <a href="https://github.com/uwdata/arquero" target="_blank">Arquero</a>,
+            <a href="https://github.com/garmin/fit-javascript-sdk" target="_blank">Garmin FIT SDK</a>,
             <a href="https://vega.github.io/" target="_blank">Vega</a>,
+            <a href="https://www.chartjs.org/" target="_blank">Chart.js</a>,
             <a href="https://github.com/thomascamminady/fit-viewer" target="_blank">this repo</a>.
         </p>
     </footer>
